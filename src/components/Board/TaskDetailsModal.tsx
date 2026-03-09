@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useKanbanStore } from '@/store/kanbanStore';
 import type { Task, Comment } from '@/store/kanbanStore';
-import { supabase } from '@/lib/supabase';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,7 +16,7 @@ interface TaskDetailsModalProps {
 }
 
 export function TaskDetailsModal({ task, open, onOpenChange }: TaskDetailsModalProps) {
-  const { updateTask } = useKanbanStore();
+  const { updateTask, userEmail } = useKanbanStore();
   
   // Local state for editing fields
   const [title, setTitle] = useState(task.title);
@@ -26,15 +25,6 @@ export function TaskDetailsModal({ task, open, onOpenChange }: TaskDetailsModalP
   const [minutes, setMinutes] = useState((task.timeSpentMinutes % 60).toString());
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState<Comment[]>(task.comments || []);
-  const [userId, setUserId] = useState<string>('');
-  const [userEmail, setUserEmail] = useState<string>('');
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setUserId(data.user?.id || '');
-      setUserEmail(data.user?.email || '');
-    });
-  }, []);
 
   // Update effect if task changes externally
   useEffect(() => {
@@ -70,8 +60,8 @@ export function TaskDetailsModal({ task, open, onOpenChange }: TaskDetailsModalP
       id: crypto.randomUUID(),
       text: newComment.trim(),
       createdAt: new Date().toISOString(),
-      authorId: userId,
-      authorEmail: userEmail,
+      authorId: '', // We can leave this empty or handle as needed, authorEmail is primary
+      authorEmail: userEmail || 'usuário anônimo',
     };
 
     const updatedComments = [...comments, comment];

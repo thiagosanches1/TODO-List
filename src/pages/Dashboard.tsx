@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import type { DropResult } from '@hello-pangea/dnd';
 import { useKanbanStore } from '@/store/kanbanStore';
@@ -11,19 +11,19 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { LogOut } from 'lucide-react';
 
 export function Dashboard() {
-  const { columns, tasks, moveTask, reorderColumn, fetchData, isLoading } = useKanbanStore();
+  const { columns, tasks, moveTask, reorderColumn, fetchData, isLoading, userEmail } = useKanbanStore();
   const [isColumnModalOpen, setIsColumnModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
-
-  const isAdmin = userEmail === 'thiago@admin.com';
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setUserEmail(data.user?.email || null);
-    });
     fetchData();
   }, [fetchData]);
+
+  const sortedColumns = useMemo(() => {
+    return [...columns].sort((a, b) => a.order - b.order);
+  }, [columns]);
+
+  const isAdmin = userEmail === 'thiago@admin.com';
 
   const handleDragEnd = (result: DropResult) => {
     const { destination, source, draggableId, type } = result;
@@ -111,9 +111,19 @@ export function Dashboard() {
                 {...provided.droppableProps}
                 ref={provided.innerRef}
               >
-                {columns.sort((a,b) => a.order - b.order).map((col, index) => {
-                  const columnTasks = tasks.filter(t => t.status === col.id).sort((a,b) => a.order - b.order);
-                  return <Column key={col.id} column={col} tasks={columnTasks} index={index} isEditMode={isEditMode} />;
+                {sortedColumns.map((col, index) => {
+                  const columnTasks = tasks
+                    .filter(t => t.status === col.id)
+                    .sort((a, b) => a.order - b.order);
+                  return (
+                    <Column 
+                      key={col.id} 
+                      column={col} 
+                      tasks={columnTasks} 
+                      index={index} 
+                      isEditMode={isEditMode} 
+                    />
+                  );
                 })}
                 {provided.placeholder}
                 

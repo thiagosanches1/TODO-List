@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useKanbanStore } from '@/store/kanbanStore';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { supabase } from '@/lib/supabase';
 
 interface CreateTaskModalProps {
   open: boolean;
@@ -14,16 +13,9 @@ interface CreateTaskModalProps {
 }
 
 export function CreateTaskModal({ open, onOpenChange, columnId }: CreateTaskModalProps) {
-  const { addTask, tasks } = useKanbanStore();
+  const { addTask, tasks, userEmail } = useKanbanStore();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [userEmail, setUserEmail] = useState<string>('');
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setUserEmail(data.user?.email || '');
-    });
-  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,7 +31,7 @@ export function CreateTaskModal({ open, onOpenChange, columnId }: CreateTaskModa
       order: columnTasksCount,
       comments: [],
       timeSpentMinutes: 0,
-      creatorEmail: userEmail,
+      creatorEmail: userEmail || '',
     });
 
     setTitle('');

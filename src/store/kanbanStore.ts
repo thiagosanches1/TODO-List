@@ -31,6 +31,8 @@ interface KanbanState {
   tasks: Task[];
   isLoading: boolean;
   error: string | null;
+  userEmail: string | null;
+  setUserEmail: (email: string | null) => void;
   fetchData: () => Promise<void>;
   setColumns: (columns: Column[]) => void;
   setTasks: (tasks: Task[]) => void;
@@ -47,6 +49,9 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
   tasks: [],
   isLoading: false,
   error: null,
+  userEmail: null,
+  
+  setUserEmail: (email) => set({ userEmail: email }),
   
   fetchData: async () => {
     set({ isLoading: true, error: null });
@@ -112,7 +117,7 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
       tasks: state.tasks.map((t) => (t.id === taskId ? { ...t, ...updates } : t)),
     }));
     
-    const dbUpdates: any = {};
+    const dbUpdates: Partial<Record<string, any>> = {};
     if ('title' in updates) dbUpdates.title = updates.title;
     if ('description' in updates) dbUpdates.description = updates.description;
     if ('status' in updates) dbUpdates.status = updates.status;
