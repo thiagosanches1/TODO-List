@@ -11,17 +11,18 @@ interface CreateColumnModalProps {
 }
 
 export function CreateColumnModal({ open, onOpenChange }: CreateColumnModalProps) {
-  const { addColumn, columns } = useKanbanStore();
+  const { addColumn, columns, currentBoardId } = useKanbanStore();
   const [title, setTitle] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim()) return;
+    if (!title.trim() || !currentBoardId) return;
 
     addColumn({
       id: crypto.randomUUID(),
       title: title.trim(),
       order: columns.length,
+      boardId: currentBoardId,
     });
 
     setTitle('');

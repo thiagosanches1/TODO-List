@@ -13,13 +13,13 @@ interface CreateTaskModalProps {
 }
 
 export function CreateTaskModal({ open, onOpenChange, columnId }: CreateTaskModalProps) {
-  const { addTask, tasks, userEmail } = useKanbanStore();
+  const { addTask, tasks, userEmail, currentBoardId } = useKanbanStore();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim()) return;
+    if (!title.trim() || !currentBoardId) return;
 
     const columnTasksCount = tasks.filter(t => t.status === columnId).length;
 
@@ -32,6 +32,7 @@ export function CreateTaskModal({ open, onOpenChange, columnId }: CreateTaskModa
       comments: [],
       timeSpentMinutes: 0,
       creatorEmail: userEmail || '',
+      boardId: currentBoardId,
     });
 
     setTitle('');

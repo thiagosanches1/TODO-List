@@ -5,13 +5,32 @@ import type { Session } from '@supabase/supabase-js';
 import { Login } from '@/pages/Login';
 import { Register } from '@/pages/Register';
 import { Dashboard } from '@/pages/Dashboard';
+import { AdminUserManagement } from '@/pages/AdminUserManagement';
+import { AdminBoardManagement } from '@/pages/AdminBoardManagement';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { useKanbanStore } from '@/store/kanbanStore';
+import { MainLayout } from '@/components/layout/MainLayout';
+import { AdminLayout } from '@/components/layout/AdminLayout';
 
-const ProtectedRoute = ({ children, session }: { children: React.ReactNode, session: Session | null }) => {
+const ProtectedRoute = ({
+  children,
+  session,
+  requireAdmin = false,
+}: {
+  children: React.ReactNode;
+  session: Session | null;
+  requireAdmin?: boolean;
+}) => {
+  const { isAdmin } = useKanbanStore();
+
   if (!session) {
     return <Navigate to="/login" replace />;
   }
+
+  if (requireAdmin && !isAdmin) {
+    return <Navigate to="/" replace />;
+  }
+
   return children;
 };
 
@@ -47,14 +66,32 @@ export default function App() {
         <Routes>
           <Route path="/login" element={!session ? <Login /> : <Navigate to="/" replace />} />
           <Route path="/register" element={!session ? <Register /> : <Navigate to="/" replace />} />
+
+          {/* Protected routes wrapped in MainLayout */}
           <Route
-            path="/"
             element={
               <ProtectedRoute session={session}>
-                <Dashboard />
+                <MainLayout />
               </ProtectedRoute>
             }
-          />
+          >
+            {/* Dashboard */}
+            <Route path="/" element={<Dashboard />} />
+
+            {/* Admin sub-routes wrapped in AdminLayout */}
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute session={session} requireAdmin={true}>
+                  <AdminLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<Navigate to="/admin/users" replace />} />
+              <Route path="users" element={<AdminUserManagement />} />
+              <Route path="boards" element={<AdminBoardManagement />} />
+            </Route>
+          </Route>
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

@@ -2,111 +2,104 @@ import { useState, useEffect, useMemo } from 'react';
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import type { DropResult } from '@hello-pangea/dnd';
 import { useKanbanStore } from '@/store/kanbanStore';
-import { supabase } from '@/lib/supabase';
 import confetti from 'canvas-confetti';
 import { Button } from '@/components/ui/button';
 import { Column } from '@/components/Board/Column';
 import { CreateColumnModal } from '@/components/Board/CreateColumnModal';
-import { ThemeToggle } from '@/components/ThemeToggle';
-import { LogOut } from 'lucide-react';
+import { LayoutDashboard } from 'lucide-react';
 
 export function Dashboard() {
-  const { columns, tasks, moveTask, reorderColumn, fetchData, isLoading, userEmail } = useKanbanStore();
+  const {
+    columns, tasks, moveTask, reorderColumn,
+    fetchData, isLoading, isEditMode,
+    boards, currentBoardId,
+  } = useKanbanStore();
   const [isColumnModalOpen, setIsColumnModalOpen] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
 
+  // Whenever currentBoardId changes (user selects a different board), re-fetch
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+  }, [fetchData, currentBoardId]);
 
   const sortedColumns = useMemo(() => {
     return [...columns].sort((a, b) => a.order - b.order);
   }, [columns]);
 
-  const isAdmin = userEmail === 'thiago@admin.com';
+  const currentBoard = useMemo(
+    () => boards.find(b => b.id === currentBoardId),
+    [boards, currentBoardId]
+  );
 
   const handleDragEnd = (result: DropResult) => {
     const { destination, source, draggableId, type } = result;
 
     if (!destination) return;
-
     if (
       destination.droppableId === source.droppableId &&
       destination.index === source.index
-    ) {
-      return;
-    }
+    ) return;
 
     if (type === 'column') {
       if (isEditMode) {
-         reorderColumn(source.index, destination.index);
+        reorderColumn(source.index, destination.index);
       }
       return;
     }
 
     moveTask(draggableId, destination.droppableId, destination.index);
 
-    // Confetti effect if moving to the "Concluído" (or a column named similarly)
     const destColumn = columns.find(c => c.id === destination.droppableId);
     if (destColumn && destColumn.title.toLowerCase().includes('conclu')) {
       confetti({
         particleCount: 100,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ['#22c55e', '#3b82f6', '#eab308']
+        colors: ['#22c55e', '#3b82f6', '#eab308'],
       });
     }
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-  };
+  // No boards assigned to this user
+  if (!isLoading && boards.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full gap-4 bg-gray-50 dark:bg-gray-900">
+        <LayoutDashboard className="h-16 w-16 text-muted-foreground/30" />
+        <h2 className="text-xl font-semibold text-muted-foreground">Nenhum board vinculado ao usuário</h2>
+        <p className="text-sm text-muted-foreground/70 text-center max-w-xs">
+          Entre em contato com um administrador para que te adicionem a um board.
+        </p>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-950">
+      <div className="flex items-center justify-center h-full bg-gray-50 dark:bg-gray-950">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
-      <header className="flex h-14 items-center justify-between border-b bg-white dark:bg-gray-950 px-6 shadow-sm">
-        <h1 className="text-xl font-bold flex items-center gap-2">
-          <span className="bg-primary text-primary-foreground p-1 rounded">✓</span>
-          TODO Kanban
-        </h1>
-        <div className="flex items-center gap-4">
-          {isAdmin && (
-            <Button 
-              variant={isEditMode ? "default" : "outline"}
-              size="sm"
-              onClick={() => setIsEditMode(!isEditMode)}
-              className="mr-2"
-            >
-              {isEditMode ? 'Salvar Configurações' : 'Editar Colunas'}
-            </Button>
-          )}
-          
-          {userEmail && (
-            <span className="text-sm text-muted-foreground mr-2 hidden sm:inline-block">
-              {userEmail}
-            </span>
-          )}
-          <ThemeToggle />
-          <Button variant="ghost" size="sm" onClick={handleLogout} className="gap-2">
-            <LogOut className="h-4 w-4" />
-            Sair
-          </Button>
+    <div className="h-full flex flex-col bg-gray-100 dark:bg-gray-900 overflow-hidden">
+      {/* Board name bar */}
+      {currentBoard && (
+        <div className="px-6 pt-4 pb-0 shrink-0">
+          <div className="flex items-center gap-2">
+            <LayoutDashboard className="h-4 w-4 text-primary" />
+            <h2 className="text-base font-semibold text-foreground">{currentBoard.name}</h2>
+            {currentBoard.description && (
+              <span className="text-sm text-muted-foreground">— {currentBoard.description}</span>
+            )}
+          </div>
         </div>
-      </header>
-      
+      )}
+
       <main className="flex-1 overflow-x-auto p-6">
         <DragDropContext onDragEnd={handleDragEnd}>
           <Droppable droppableId="board" direction="horizontal" type="column">
             {(provided) => (
-              <div 
+              <div
                 className="flex gap-6 h-full items-start"
                 {...provided.droppableProps}
                 ref={provided.innerRef}
@@ -116,26 +109,26 @@ export function Dashboard() {
                     .filter(t => t.status === col.id)
                     .sort((a, b) => a.order - b.order);
                   return (
-                    <Column 
-                      key={col.id} 
-                      column={col} 
-                      tasks={columnTasks} 
-                      index={index} 
-                      isEditMode={isEditMode} 
+                    <Column
+                      key={col.id}
+                      column={col}
+                      tasks={columnTasks}
+                      index={index}
+                      isEditMode={isEditMode}
                     />
                   );
                 })}
                 {provided.placeholder}
-                
+
                 {isEditMode && (
                   <div className="min-w-[300px] shrink-0">
-                     <Button
-                       variant="outline"
-                       className="w-full justify-start text-muted-foreground border-dashed h-12 hover:bg-primary/5 hover:text-primary hover:border-primary"
-                       onClick={() => setIsColumnModalOpen(true)}
-                     >
-                       + Adicionar Coluna
-                     </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-muted-foreground border-dashed h-12 hover:bg-primary/5 hover:text-primary hover:border-primary"
+                      onClick={() => setIsColumnModalOpen(true)}
+                    >
+                      + Adicionar Coluna
+                    </Button>
                   </div>
                 )}
               </div>
