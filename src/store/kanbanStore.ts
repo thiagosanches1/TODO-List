@@ -9,6 +9,7 @@ export interface Task {
   timeSpentMinutes: number;
   comments: Comment[];
   order: number;
+  creatorEmail?: string;
 }
 
 export interface Comment {
@@ -16,6 +17,7 @@ export interface Comment {
   text: string;
   createdAt: string;
   authorId: string;
+  authorEmail: string;
 }
 
 export interface Column {
@@ -37,6 +39,7 @@ interface KanbanState {
   addColumn: (column: Column) => Promise<void>;
   reorderColumn: (sourceIndex: number, destinationIndex: number) => Promise<void>;
   moveTask: (taskId: string, newStatus: string, newOrder: number) => Promise<void>;
+  deleteTask: (taskId: string) => Promise<void>;
 }
 
 export const useKanbanStore = create<KanbanState>((set, get) => ({
@@ -77,7 +80,8 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
       status: t.status,
       timeSpentMinutes: t.time_spent_minutes,
       comments: t.comments || [],
-      order: t.order_index
+      order: t.order_index,
+      creatorEmail: t.creator_email
     }));
 
     set({ columns: mappedColumns, tasks: mappedTasks, isLoading: false });
@@ -96,7 +100,8 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
       status: task.status,
       time_spent_minutes: task.timeSpentMinutes,
       comments: task.comments,
-      order_index: task.order
+      order_index: task.order,
+      creator_email: task.creatorEmail
     });
     
     if (error) console.error('Error adding task', error);
@@ -114,6 +119,7 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
     if ('timeSpentMinutes' in updates) dbUpdates.time_spent_minutes = updates.timeSpentMinutes;
     if ('comments' in updates) dbUpdates.comments = updates.comments;
     if ('order' in updates) dbUpdates.order_index = updates.order;
+    if ('creatorEmail' in updates) dbUpdates.creator_email = updates.creatorEmail;
     
     if (Object.keys(dbUpdates).length > 0) {
       const { error } = await supabase.from('tasks').update(dbUpdates).eq('id', taskId);
@@ -168,5 +174,14 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
     }).eq('id', taskId);
     
     if (error) console.error('Error moving task', error);
+  },
+
+  deleteTask: async (taskId) => {
+    set((state) => ({
+      tasks: state.tasks.filter((t) => t.id !== taskId),
+    }));
+    
+    const { error } = await supabase.from('tasks').delete().eq('id', taskId);
+    if (error) console.error('Error deleting task', error);
   },
 }));

@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Clock, Send } from 'lucide-react';
+import { Clock, Send, X } from 'lucide-react';
 
 interface TaskDetailsModalProps {
   task: Task;
@@ -27,9 +27,13 @@ export function TaskDetailsModal({ task, open, onOpenChange }: TaskDetailsModalP
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState<Comment[]>(task.comments || []);
   const [userId, setUserId] = useState<string>('');
+  const [userEmail, setUserEmail] = useState<string>('');
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id || ''));
+    supabase.auth.getUser().then(({ data }) => {
+      setUserId(data.user?.id || '');
+      setUserEmail(data.user?.email || '');
+    });
   }, []);
 
   // Update effect if task changes externally
@@ -67,20 +71,40 @@ export function TaskDetailsModal({ task, open, onOpenChange }: TaskDetailsModalP
       text: newComment.trim(),
       createdAt: new Date().toISOString(),
       authorId: userId,
+      authorEmail: userEmail,
     };
 
     const updatedComments = [...comments, comment];
     setComments(updatedComments);
     setNewComment('');
     
-    // Auto-save just the comment part
+    // Auto-save just the comment part to DB immediately as per usual chat pattern
     updateTask(task.id, { comments: updatedComments });
+  };
+
+  const handleDeleteComment = (commentId: string) => {
+    const updatedComments = comments.filter(c => c.id !== commentId);
+    setComments(updatedComments);
+    updateTask(task.id, { comments: updatedComments });
+  };
+
+  const handleCancel = () => {
+    // Reset local state to task values
+    setTitle(task.title);
+    setDescription(task.description || '');
+    setHours(Math.floor(task.timeSpentMinutes / 60).toString());
+    setMinutes((task.timeSpentMinutes % 60).toString());
+    onOpenChange(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={(val) => {
-      if (!val) handleSave(); // save on close
-      onOpenChange(val);
+      if (!val) {
+        // Just close without auto-saving now, user must click Save
+        onOpenChange(false);
+      } else {
+        onOpenChange(true);
+      }
     }}>
       <DialogContent className="sm:max-w-[600px] h-[85vh] flex flex-col p-0 overflow-hidden">
         <DialogHeader className="px-6 py-4 border-b">
@@ -146,11 +170,21 @@ export function TaskDetailsModal({ task, open, onOpenChange }: TaskDetailsModalP
                   <p className="text-sm text-muted-foreground italic">Nenhum comentário ainda.</p>
                 ) : (
                   comments.map(comment => (
-                    <div key={comment.id} className="bg-gray-50 dark:bg-gray-900 border rounded-xl p-3 text-sm">
+                    <div key={comment.id} className="bg-gray-50 dark:bg-gray-900 border rounded-xl p-3 text-sm relative group">
+                      <button 
+                        onClick={() => handleDeleteComment(comment.id)}
+                        className="absolute top-2 right-2 p-1 rounded-md opacity-0 group-hover:opacity-100 hover:bg-gray-200 dark:hover:bg-gray-800 transition-all text-muted-foreground"
+                        title="Deletar comentário"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                      <div className="flex justify-between items-start mb-1 pr-6">
+                        <span className="font-semibold text-xs text-primary">{comment.authorEmail}</span>
+                        <span className="text-[10px] text-muted-foreground">
+                          {new Date(comment.createdAt).toLocaleString()}
+                        </span>
+                      </div>
                       <p className="text-gray-800 dark:text-gray-200">{comment.text}</p>
-                      <p className="text-xs text-muted-foreground mt-2">
-                        {new Date(comment.createdAt).toLocaleString()}
-                      </p>
                     </div>
                   ))
                 )}
@@ -159,18 +193,29 @@ export function TaskDetailsModal({ task, open, onOpenChange }: TaskDetailsModalP
           </div>
         </ScrollArea>
 
-        {/* Add Comment Input */}
-        <div className="p-4 border-t bg-gray-50/50 dark:bg-gray-950/50">
-          <form className="flex gap-2" onSubmit={handleAddComment}>
-            <Input 
-              placeholder="Escreva um comentário..." 
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-            />
-            <Button type="submit" size="icon" disabled={!newComment.trim()}>
-              <Send className="h-4 w-4" />
+        {/* Footer with Save/Cancel buttons */}
+        <div className="p-4 border-t flex items-center justify-between bg-white dark:bg-gray-950">
+          <div className="flex-1 mr-4">
+            <form className="flex gap-2" onSubmit={handleAddComment}>
+              <Input 
+                placeholder="Escreva um comentário..." 
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                className="bg-gray-50 dark:bg-gray-900"
+              />
+              <Button type="submit" size="icon" disabled={!newComment.trim()} variant="ghost">
+                <Send className="h-4 w-4" />
+              </Button>
+            </form>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleCancel}>
+              Cancelar
             </Button>
-          </form>
+            <Button onClick={handleSave}>
+              Salvar Alterações
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
