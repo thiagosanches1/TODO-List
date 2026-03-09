@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import {
   Columns, Plus, Trash2, Loader2, Edit2,
-  GripVertical, Save, RotateCcw, X,
+  GripVertical, Save, RotateCcw,
 } from 'lucide-react';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,

@@ -29,7 +29,6 @@ export function AdminUserManagement() {
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
 
   // Form state
   const [email, setEmail] = useState('');
@@ -67,7 +66,7 @@ export function AdminUserManagement() {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
-    setSuccess(null);
+    setError(null);
 
     try {
       // In a real production app with Supabase, we would use an Edge Function 
@@ -89,7 +88,7 @@ export function AdminUserManagement() {
 
       if (signUpError) throw signUpError;
 
-      setSuccess(`Usuário ${email} criado com sucesso!`);
+      console.log(`Usuário ${email} criado com sucesso!`);
       setEmail('');
       setPassword('');
       setFullName('');
@@ -125,7 +124,7 @@ export function AdminUserManagement() {
 
       if (error) throw error;
 
-      setSuccess(`Perfil de ${editingProfile.email} atualizado!`);
+      console.log(`Perfil de ${editingProfile.email} atualizado!`);
       setIsEditDialogOpen(false);
       fetchProfiles();
     } catch (err: any) {
@@ -155,7 +154,7 @@ export function AdminUserManagement() {
 
       if (rpcError) throw rpcError;
 
-      setSuccess(`Usuário ${profile.email} removido.`);
+      console.log(`Usuário ${profile.email} removido.`);
       fetchProfiles();
     } catch (err: any) {
       setError(err.message || 'Erro ao excluir usuário');
