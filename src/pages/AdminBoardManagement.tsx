@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { LayoutDashboard, Plus, Trash2, Users, Loader2, Edit2 } from 'lucide-react';
+import { LayoutDashboard, Plus, Trash2, Users, Loader2, Edit2, Columns } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -27,6 +28,7 @@ interface Profile {
 }
 
 export function AdminBoardManagement() {
+  const navigate = useNavigate();
   const [boards, setBoards] = useState<Board[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -272,6 +274,15 @@ export function AdminBoardManagement() {
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => navigate(`/admin/boards/${board.id}`)}
+                            className="h-8 px-3 gap-1.5 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
+                          >
+                            <Columns className="h-3.5 w-3.5" />
+                            Colunas
+                          </Button>
                           <Button
                             variant="ghost"
                             size="sm"

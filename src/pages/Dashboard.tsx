@@ -1,22 +1,17 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import type { DropResult } from '@hello-pangea/dnd';
 import { useKanbanStore } from '@/store/kanbanStore';
 import confetti from 'canvas-confetti';
-import { Button } from '@/components/ui/button';
 import { Column } from '@/components/Board/Column';
-import { CreateColumnModal } from '@/components/Board/CreateColumnModal';
 import { LayoutDashboard } from 'lucide-react';
 
 export function Dashboard() {
   const {
-    columns, tasks, moveTask, reorderColumn,
-    fetchData, isLoading, isEditMode,
+    columns, tasks, moveTask, fetchData, isLoading,
     boards, currentBoardId,
   } = useKanbanStore();
-  const [isColumnModalOpen, setIsColumnModalOpen] = useState(false);
 
-  // Whenever currentBoardId changes (user selects a different board), re-fetch
   useEffect(() => {
     fetchData();
   }, [fetchData, currentBoardId]);
@@ -39,12 +34,8 @@ export function Dashboard() {
       destination.index === source.index
     ) return;
 
-    if (type === 'column') {
-      if (isEditMode) {
-        reorderColumn(source.index, destination.index);
-      }
-      return;
-    }
+    // Column dragging disabled — only task dragging
+    if (type === 'column') return;
 
     moveTask(draggableId, destination.droppableId, destination.index);
 
@@ -114,33 +105,15 @@ export function Dashboard() {
                       column={col}
                       tasks={columnTasks}
                       index={index}
-                      isEditMode={isEditMode}
                     />
                   );
                 })}
                 {provided.placeholder}
-
-                {isEditMode && (
-                  <div className="min-w-[300px] shrink-0">
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start text-muted-foreground border-dashed h-12 hover:bg-primary/5 hover:text-primary hover:border-primary"
-                      onClick={() => setIsColumnModalOpen(true)}
-                    >
-                      + Adicionar Coluna
-                    </Button>
-                  </div>
-                )}
               </div>
             )}
           </Droppable>
         </DragDropContext>
       </main>
-
-      <CreateColumnModal
-        open={isColumnModalOpen}
-        onOpenChange={setIsColumnModalOpen}
-      />
     </div>
   );
 }

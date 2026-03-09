@@ -7,6 +7,7 @@ import { Register } from '@/pages/Register';
 import { Dashboard } from '@/pages/Dashboard';
 import { AdminUserManagement } from '@/pages/AdminUserManagement';
 import { AdminBoardManagement } from '@/pages/AdminBoardManagement';
+import { AdminBoardConfig } from '@/pages/AdminBoardConfig';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { useKanbanStore } from '@/store/kanbanStore';
 import { MainLayout } from '@/components/layout/MainLayout';
@@ -90,6 +91,7 @@ export default function App() {
               <Route index element={<Navigate to="/admin/users" replace />} />
               <Route path="users" element={<AdminUserManagement />} />
               <Route path="boards" element={<AdminBoardManagement />} />
+              <Route path="boards/:boardId" element={<AdminBoardConfig />} />
             </Route>
           </Route>
         </Routes>

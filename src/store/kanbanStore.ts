@@ -44,11 +44,9 @@ interface KanbanState {
   userEmail: string | null;
   userName: string | null;
   isAdmin: boolean;
-  isEditMode: boolean;
 
   setUserEmail: (email: string | null) => void;
   setIsAdmin: (isAdmin: boolean) => void;
-  setIsEditMode: (isEditMode: boolean) => void;
   setCurrentBoardId: (boardId: string | null) => void;
   fetchBoards: () => Promise<void>;
   fetchData: () => Promise<void>;
@@ -56,11 +54,8 @@ interface KanbanState {
   setTasks: (tasks: Task[]) => void;
   addTask: (task: Task) => Promise<void>;
   updateTask: (taskId: string, updates: Partial<Task>) => Promise<void>;
-  addColumn: (column: Column) => Promise<void>;
-  reorderColumn: (sourceIndex: number, destinationIndex: number) => Promise<void>;
   moveTask: (taskId: string, newStatus: string, newOrder: number) => Promise<void>;
   deleteTask: (taskId: string) => Promise<void>;
-  renameColumn: (columnId: string, newTitle: string) => Promise<void>;
 }
 
 export const useKanbanStore = create<KanbanState>((set, get) => ({
@@ -73,16 +68,13 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
   userEmail: null,
   userName: null,
   isAdmin: false,
-  isEditMode: false,
 
   setUserEmail: (email) => set({ userEmail: email }),
   setIsAdmin: (isAdmin) => set({ isAdmin }),
-  setIsEditMode: (isEditMode) => set({ isEditMode }),
 
   setCurrentBoardId: (boardId) => {
     set({ currentBoardId: boardId, columns: [], tasks: [] });
     if (boardId) {
-      // fetch board data after setting the id
       setTimeout(() => get().fetchData(), 0);
     }
   },
@@ -113,7 +105,6 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
 
     set({ boards });
 
-    // Auto-select first board if none selected
     const currentBoardId = get().currentBoardId;
     if (!currentBoardId && boards.length > 0) {
       set({ currentBoardId: boards[0].id });
@@ -210,39 +201,6 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
     }
   },
 
-  addColumn: async (column) => {
-    set((state) => ({ columns: [...state.columns, column] }));
-
-    const { error } = await supabase.from('columns').insert({
-      id: column.id,
-      title: column.title,
-      order_index: column.order,
-      board_id: column.boardId,
-    });
-
-    if (error) console.error('Error adding column', error);
-  },
-
-  reorderColumn: async (sourceIndex, destinationIndex) => {
-    const { columns } = get();
-    const newColumns = Array.from(columns).sort((a, b) => a.order - b.order);
-    const [removed] = newColumns.splice(sourceIndex, 1);
-    newColumns.splice(destinationIndex, 0, removed);
-
-    const updatedColumns = newColumns.map((c, i) => ({ ...c, order: i }));
-    set({ columns: updatedColumns });
-
-    const dbUpdates = updatedColumns.map(c => ({
-      id: c.id,
-      title: c.title,
-      order_index: c.order,
-      board_id: c.boardId,
-    }));
-
-    const { error } = await supabase.from('columns').upsert(dbUpdates);
-    if (error) console.error('Error reordering columns', error);
-  },
-
   moveTask: async (taskId, newStatus, newOrder) => {
     set((state) => {
       const taskIndex = state.tasks.findIndex(t => t.id === taskId);
@@ -268,18 +226,5 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
 
     const { error } = await supabase.from('tasks').delete().eq('id', taskId);
     if (error) console.error('Error deleting task', error);
-  },
-
-  renameColumn: async (columnId, newTitle) => {
-    set((state) => ({
-      columns: state.columns.map((c) =>
-        c.id === columnId ? { ...c, title: newTitle } : c
-      ),
-    }));
-    const { error } = await supabase
-      .from('columns')
-      .update({ title: newTitle })
-      .eq('id', columnId);
-    if (error) console.error('Error renaming column', error);
   },
 }));

@@ -8,7 +8,7 @@ import { useEffect } from 'react';
 
 export function Header() {
   const {
-    userEmail, userName, isAdmin, isEditMode, setIsEditMode,
+    userEmail, userName, isAdmin,
     boards, currentBoardId, setCurrentBoardId, fetchBoards,
   } = useKanbanStore();
   const location = useLocation();
@@ -23,7 +23,7 @@ export function Header() {
   };
 
   const displayName = userName
-    ? userName.split(' ')[0]  // just first name
+    ? userName.split(' ')[0]
     : userEmail?.split('@')[0] ?? '';
 
   useEffect(() => {
@@ -65,7 +65,7 @@ export function Header() {
       )}
 
       <div className="flex items-center gap-4 ml-auto">
-        {/* Greeting — shown from sm breakpoint */}
+        {/* Greeting */}
         {displayName && (
           <span className="text-sm text-muted-foreground whitespace-nowrap hidden sm:inline-block">
             {getGreeting()}, <span className="font-medium text-foreground">{displayName}</span> !
@@ -82,17 +82,6 @@ export function Header() {
           </Link>
         )}
 
-        {/* Edit columns button — only on dashboard for admins */}
-        {isAdmin && isDashboard && (
-          <Button
-            variant={isEditMode ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setIsEditMode(!isEditMode)}
-          >
-            {isEditMode ? 'Salvar Configurações' : 'Editar Colunas'}
-          </Button>
-        )}
-
         {/* Admin settings icon */}
         {isAdmin && (
           <Link to="/admin/users">
@@ -105,7 +94,6 @@ export function Header() {
             </Button>
           </Link>
         )}
-
 
         <ThemeToggle />
         <Button variant="ghost" size="sm" onClick={handleLogout} className="gap-2">
