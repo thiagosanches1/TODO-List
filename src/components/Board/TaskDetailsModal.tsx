@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useKanbanStore } from '@/store/kanbanStore';
 import type { Task, Comment } from '@/store/kanbanStore';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -29,6 +29,14 @@ export function TaskDetailsModal({ task, open, onOpenChange }: TaskDetailsModalP
   const [hours, setHours] = useState(Math.floor(task.timeSpentMinutes / 60).toString());
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState<Comment[]>(task.comments || []);
+  const feedBottomRef = useRef<HTMLDivElement>(null);
+
+  // Rolagem automática para o novo comentário no feed
+  useEffect(() => {
+    if (comments.length > 0) {
+      feedBottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+  }, [comments.length]);
 
   // Update effect if task changes externally
   useEffect(() => {
@@ -241,6 +249,7 @@ export function TaskDetailsModal({ task, open, onOpenChange }: TaskDetailsModalP
                     </div>
                   ))
                 )}
+                <div ref={feedBottomRef} className="h-0 w-full" aria-hidden />
               </div>
             </ScrollArea>
           </div>
