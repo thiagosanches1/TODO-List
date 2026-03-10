@@ -240,14 +240,14 @@ export function AdminBoardManagement() {
       )}
 
       {/* Board List */}
-      <Card className="shadow-lg border-primary/10 overflow-hidden">
-        <CardHeader className="bg-primary/5 border-b">
+      <Card className="shadow-2xl border-primary/10 overflow-hidden bg-background/50 backdrop-blur-xl">
+        <CardHeader className="bg-muted/30 border-b border-white/5">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-xl flex items-center gap-2">
+            <CardTitle className="text-xl flex items-center gap-2 font-black">
               <LayoutDashboard className="h-5 w-5 text-primary" />
               Boards Cadastrados
             </CardTitle>
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-muted-foreground font-medium">
               Total: {boards.length} board{boards.length !== 1 ? 's' : ''}
             </div>
           </div>
@@ -266,49 +266,49 @@ export function AdminBoardManagement() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
-                <thead className="text-xs uppercase bg-muted/50 text-muted-foreground font-medium border-b">
+                <thead className="text-[10px] uppercase bg-muted/20 text-muted-foreground font-black tracking-widest border-b border-white/5">
                   <tr>
-                    <th className="px-6 py-3">Nome</th>
-                    <th className="px-6 py-3">Descrição</th>
-                    <th className="px-6 py-3 text-center">Membros</th>
-                    <th className="px-6 py-3 text-right">Ações</th>
+                    <th className="px-8 py-4">Nome</th>
+                    <th className="px-8 py-4">Descrição</th>
+                    <th className="px-8 py-4 text-center">Membros</th>
+                    <th className="px-8 py-4 text-right">Ações</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-muted">
+                <tbody className="divide-y divide-white/5">
                   {boards.map((board) => (
-                    <tr key={board.id} className="hover:bg-muted/30 transition-colors">
-                      <td className="px-6 py-4 font-semibold">{board.name}</td>
-                      <td className="px-6 py-4 text-muted-foreground">{board.description || '—'}</td>
-                      <td className="px-6 py-4 text-center">
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary">
+                    <tr key={board.id} className="hover:bg-primary/[0.02] transition-colors">
+                      <td className="px-8 py-5 font-bold text-base">{board.name}</td>
+                      <td className="px-8 py-5 text-muted-foreground italic font-medium">{board.description || '—'}</td>
+                      <td className="px-8 py-5 text-center">
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter bg-primary/10 text-primary border border-primary/20">
                           {board.memberCount} membro{board.memberCount !== 1 ? 's' : ''}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex justify-end gap-2">
+                      <td className="px-8 py-5 text-right">
+                        <div className="flex justify-end gap-3">
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => navigate(`/admin/boards/${board.id}`)}
-                            className="h-8 px-3 gap-1.5 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
+                            className="h-9 px-4 gap-2 text-indigo-400 hover:text-indigo-300 hover:bg-indigo-500/10 border border-indigo-500/20 rounded-xl transition-all"
                           >
-                            <Columns className="h-3.5 w-3.5" />
+                            <Columns className="h-4 w-4" />
                             Colunas
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => openMembersModal(board)}
-                            className="h-8 px-3 gap-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                            className="h-9 px-4 gap-2 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 border border-blue-500/20 rounded-xl transition-all"
                           >
-                            <Users className="h-3.5 w-3.5" />
+                            <Users className="h-4 w-4" />
                             Membros
                           </Button>
                           <Button
                             variant="ghost"
                             size="icon"
                             onClick={() => openEditModal(board)}
-                            className="h-8 w-8 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                            className="h-9 w-9 text-amber-500 hover:text-amber-400 hover:bg-amber-500/10 rounded-xl border border-amber-500/20 transition-all"
                             title="Editar board"
                           >
                             <Edit2 className="h-4 w-4" />
@@ -318,7 +318,7 @@ export function AdminBoardManagement() {
                             size="icon"
                             onClick={() => handleDeleteBoard(board)}
                             disabled={isSubmitting}
-                            className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                            className="h-9 w-9 text-destructive hover:text-white hover:bg-destructive shadow-sm hover:shadow-destructive/40 rounded-xl transition-all border border-destructive/20"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>

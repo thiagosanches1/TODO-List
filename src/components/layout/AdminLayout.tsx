@@ -3,9 +3,9 @@ import { Users, LayoutDashboard } from 'lucide-react';
 
 export function AdminLayout() {
   return (
-    <div className="flex h-full overflow-hidden bg-background">
+    <div className="flex h-full bg-background overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-64 shrink-0 border-r bg-muted/30 backdrop-blur-sm flex flex-col pt-8 gap-1 px-4 transition-all duration-300">
+      <aside className="w-64 shrink-0 border-r bg-muted/30 backdrop-blur-md flex flex-col pt-8 pb-8 gap-1 px-4 transition-all duration-300 h-full">
         <p className="px-3 text-[10px] font-bold text-muted-foreground uppercase tracking-[0.15em] mb-4 opacity-70">
           Administração
         </p>

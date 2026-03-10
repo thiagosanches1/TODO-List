@@ -74,7 +74,7 @@ export function AdminUserManagement() {
       // Since we are in a dev environment and for simplicity, we use auth.signUp()
       // Note: This will create a user and potentially log them in or send confirmation email depending on Supabase settings.
       // A more robust admin approach uses a Security Definer function or Edge Function.
-      
+
       const { error: signUpError } = await supabase.auth.signUp({
         email,
         password,
@@ -112,7 +112,7 @@ export function AdminUserManagement() {
   const handleUpdateProfile = async () => {
     if (!editingProfile) return;
     setIsSubmitting(true);
-    
+
     try {
       const { error } = await supabase
         .from('profiles')
@@ -173,91 +173,89 @@ export function AdminUserManagement() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 p-4 md:p-8">
-      <div className="max-w-6xl mx-auto space-y-8">
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold tracking-tight">Gerenciamento de Usuários</h1>
-          <Button onClick={() => setIsCreateDialogOpen(true)} className="gap-2 shadow-md">
-            <UserPlus className="h-4 w-4" />
-            Criar Usuário
-          </Button>
-        </div>
+    <div className="p-6 md:p-8 space-y-8">
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold tracking-tight">Gerenciamento de Usuários</h1>
+        <Button onClick={() => setIsCreateDialogOpen(true)} className="gap-2 shadow-md">
+          <UserPlus className="h-4 w-4" />
+          Criar Usuário
+        </Button>
+      </div>
 
-        <div className="grid grid-cols-1 gap-8">
-          {/* User List - Full Width */}
-          <Card className="shadow-lg border-primary/10 overflow-hidden">
-            <CardHeader className="bg-primary/5 border-b">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-xl">Usuários Cadastrados</CardTitle>
-                <div className="text-sm text-muted-foreground">
-                  Total: {profiles.length} usuários
-                </div>
+      <div className="grid grid-cols-1 gap-8">
+        {/* User List - Full Width */}
+        <Card className="shadow-2xl border-primary/10 overflow-hidden bg-background/50 backdrop-blur-xl">
+          <CardHeader className="bg-muted/30 border-b border-white/5">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-xl font-black">Usuários Cadastrados</CardTitle>
+              <div className="text-sm text-muted-foreground font-medium">
+                Total: {profiles.length} usuários
               </div>
-            </CardHeader>
-            <CardContent className="p-0">
-              {loading ? (
-                <div className="flex items-center justify-center p-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                </div>
-              ) : profiles.length === 0 ? (
-                <div className="p-8 text-center text-muted-foreground">
-                  Nenhum usuário encontrado.
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left">
-                    <thead className="text-xs uppercase bg-muted/50 text-muted-foreground font-medium border-b">
-                      <tr>
-                        <th className="px-6 py-3">Nome</th>
-                        <th className="px-6 py-3">Email</th>
-                        <th className="px-6 py-3 text-center">Admin</th>
-                        <th className="px-6 py-3 text-right">Ações</th>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            {loading ? (
+              <div className="flex items-center justify-center p-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : profiles.length === 0 ? (
+              <div className="p-8 text-center text-muted-foreground font-medium">
+                Nenhum usuário encontrado.
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm text-left">
+                  <thead className="text-[10px] uppercase bg-muted/20 text-muted-foreground font-black tracking-widest border-b border-white/5">
+                    <tr>
+                      <th className="px-8 py-4">Nome</th>
+                      <th className="px-8 py-4">Email</th>
+                      <th className="px-8 py-4 text-center">Admin</th>
+                      <th className="px-8 py-4 text-right">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {profiles.map((profile) => (
+                      <tr key={profile.id} className="hover:bg-primary/[0.02] transition-colors">
+                        <td className="px-8 py-5 font-bold text-base">{profile.full_name}</td>
+                        <td className="px-8 py-5 text-muted-foreground font-medium">{profile.email}</td>
+                        <td className="px-8 py-5 text-center">
+                          {profile.is_admin ? (
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter bg-primary/10 text-primary border border-primary/20">
+                              Sim
+                            </span>
+                          ) : (
+                            <span className="text-muted-foreground font-medium text-xs opacity-50">Não</span>
+                          )}
+                        </td>
+                        <td className="px-8 py-5 text-right">
+                          <div className="flex justify-end gap-3">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleEditClick(profile)}
+                              className="h-9 w-9 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 border border-blue-500/20 rounded-xl transition-all"
+                            >
+                              <Edit2 className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDeleteUser(profile)}
+                              disabled={profile.email === 'thiago@admin.com'}
+                              className="h-9 w-9 text-destructive hover:text-white hover:bg-destructive shadow-sm hover:shadow-destructive/40 rounded-xl transition-all border border-destructive/20"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody className="divide-y divide-muted">
-                      {profiles.map((profile) => (
-                        <tr key={profile.id} className="hover:bg-muted/30 transition-colors">
-                          <td className="px-6 py-4 font-medium">{profile.full_name}</td>
-                          <td className="px-6 py-4 text-muted-foreground">{profile.email}</td>
-                          <td className="px-6 py-4 text-center">
-                            {profile.is_admin ? (
-                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary">
-                                Sim
-                              </span>
-                            ) : (
-                              <span className="text-muted-foreground">Não</span>
-                            )}
-                          </td>
-                          <td className="px-6 py-4 text-right">
-                            <div className="flex justify-end gap-2">
-                              <Button 
-                                variant="ghost" 
-                                size="icon" 
-                                onClick={() => handleEditClick(profile)}
-                                className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                              >
-                                <Edit2 className="h-4 w-4" />
-                              </Button>
-                              <Button 
-                                variant="ghost" 
-                                size="icon"
-                                onClick={() => handleDeleteUser(profile)}
-                                disabled={profile.email === 'thiago@admin.com'}
-                                className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       {/* Create User Dialog */}

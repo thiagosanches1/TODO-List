@@ -197,7 +197,7 @@ export function AdminBoardConfig() {
   };
 
   return (
-    <div className="p-6 md:p-8 space-y-8 pb-32">
+    <div className="p-6 md:p-8 space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <div>
@@ -231,16 +231,16 @@ export function AdminBoardConfig() {
       )}
 
       {/* Main Column Listing */}
-      <Card className="shadow-lg border-primary/10 overflow-hidden">
-        <CardHeader className="bg-primary/5 border-b">
+      <Card className="shadow-2xl border-primary/10 overflow-hidden bg-background/50 backdrop-blur-xl">
+        <CardHeader className="bg-muted/30 border-b border-white/5">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-xl flex items-center gap-2">
+            <CardTitle className="text-xl flex items-center gap-2 font-black">
               <Columns className="h-5 w-5 text-primary" />
               Organizador de Colunas
             </CardTitle>
-            <span className="text-sm text-muted-foreground">
+            <span className="text-sm text-muted-foreground font-medium">
               {localColumns.length} coluna{localColumns.length !== 1 ? 's' : ''}
-              {isDirty && <span className="ml-2 text-amber-500 font-medium">(Alterações não salvas)</span>}
+              {isDirty && <span className="ml-2 text-amber-500 font-black uppercase text-[10px] tracking-tighter">(Alterações não salvas)</span>}
             </span>
           </div>
         </CardHeader>
@@ -252,14 +252,14 @@ export function AdminBoardConfig() {
           ) : localColumns.length === 0 ? (
             <div className="p-12 text-center">
               <Columns className="mx-auto h-12 w-12 text-muted-foreground/40 mb-4" />
-              <p className="text-muted-foreground text-sm">Nenhuma coluna disponível.</p>
+              <p className="text-muted-foreground text-sm font-medium">Nenhuma coluna disponível.</p>
               <p className="text-muted-foreground/70 text-xs mt-1">Crie a primeira coluna para este board.</p>
             </div>
           ) : (
             <div className="w-full text-sm">
               {/* Header */}
-              <div className="grid grid-cols-[48px_48px_1fr_180px] w-full text-xs uppercase bg-muted/50 text-muted-foreground font-extrabold border-b px-6 py-4">
-                <div className="flex justify-center text-primary/50">#</div>
+              <div className="grid grid-cols-[64px_48px_1fr_180px] w-full text-[10px] uppercase bg-muted/20 text-muted-foreground font-black tracking-widest border-b border-white/5 px-8 py-4">
+                <div className="flex justify-center text-primary/40">#</div>
                 <div className="text-center invisible">#</div>
                 <div>Nome da Coluna</div>
                 <div className="text-right px-4">Ações</div>
@@ -294,9 +294,9 @@ export function AdminBoardConfig() {
                                 }}
                                 className={`${snapshot.isDragging ? 'pointer-events-none' : ''}`}
                               >
-                                <div className={`grid grid-cols-[48px_48px_1fr_180px] w-full items-center transition-all px-6 py-4 ${snapshot.isDragging
+                                <div className={`grid grid-cols-[64px_48px_1fr_180px] w-full items-center transition-all px-8 py-5 ${snapshot.isDragging
                                   ? 'bg-background border-2 border-primary shadow-2xl rounded-2xl ring-4 ring-primary/20 scale-[1.01]'
-                                  : 'hover:bg-muted/30'
+                                  : 'hover:bg-primary/[0.02]'
                                   }`}>
                                   <div className="flex justify-center">
                                     <div {...provided.dragHandleProps} className="cursor-grab active:cursor-grabbing p-1.5 hover:bg-muted rounded-lg text-muted-foreground transition-all hover:text-primary pointer-events-auto">
