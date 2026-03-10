@@ -22,9 +22,8 @@ export function TaskCard({ task, provided, isDragging }: TaskCardProps) {
         ref={provided.innerRef}
         {...provided.draggableProps}
         {...provided.dragHandleProps}
-        className={`relative group cursor-grab active:cursor-grabbing hover:ring-1 hover:ring-primary/50 transition-shadow ${
-          isDragging ? 'opacity-90 ring-2 ring-primary shadow-xl rotate-2' : 'shadow-sm'
-        }`}
+        className={`relative group cursor-grab active:cursor-grabbing hover-lift glass-card border-border/40 rounded-xl transition-all duration-300 ${isDragging ? 'opacity-90 ring-2 ring-primary shadow-2xl z-50 scale-105 rotate-2' : ''
+          }`}
         onClick={() => setIsModalOpen(true)}
       >
         <button
@@ -34,41 +33,45 @@ export function TaskCard({ task, provided, isDragging }: TaskCardProps) {
               deleteTask(task.id);
             }
           }}
-          className="absolute top-2 right-2 p-1.5 rounded-md opacity-0 group-hover:opacity-100 hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/30 dark:hover:text-red-400 transition-all text-muted-foreground z-10"
+          className="absolute top-2 right-2 p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-destructive hover:text-destructive-foreground transition-all duration-200 text-muted-foreground z-10"
           title="Remover tarefa"
         >
           <Trash2 className="h-3.5 w-3.5" />
         </button>
-        <CardContent className="p-4 space-y-3">
-          <div className="font-medium text-sm leading-tight text-gray-900 dark:text-gray-100">
+        <CardContent className="p-4 space-y-4">
+          <div className="font-bold text-sm leading-tight text-foreground/90 group-hover:text-primary transition-colors">
             {task.title}
           </div>
-          
+
           {task.description && (
-            <p className="text-xs text-muted-foreground line-clamp-2">
+            <p className="text-[11px] text-muted-foreground/80 line-clamp-2 leading-relaxed">
               {task.description}
             </p>
           )}
 
-          <div className="flex items-center gap-3 text-[10px] text-muted-foreground pt-1 border-t border-gray-100 dark:border-gray-800 mt-2 pt-2">
+          <div className="flex items-center gap-3 pt-3 border-t border-border/30 mt-1">
             {task.creatorEmail && (
-              <div className="flex items-center gap-1 max-w-[120px] truncate">
-                <User className="h-3 w-3" />
-                <span className="truncate">{task.creatorEmail}</span>
+              <div className="flex items-center gap-1.5 max-w-[120px] truncate">
+                <div className="p-1 rounded-full bg-muted border border-border/50">
+                  <User className="h-2.5 w-2.5 text-muted-foreground" />
+                </div>
+                <span className="text-[10px] font-medium text-muted-foreground truncate">{task.creatorEmail.split('@')[0]}</span>
               </div>
             )}
             <div className="flex-1" />
-            {task.comments && task.comments.length > 0 && (
-              <div className="flex items-center gap-1">
-                <MessageSquare className="h-3 w-3" />
-                <span>{task.comments.length}</span>
+            <div className="flex items-center gap-3">
+              {task.comments && task.comments.length > 0 && (
+                <div className="flex items-center gap-1 text-[10px] font-bold text-primary/70">
+                  <MessageSquare className="h-3 w-3" />
+                  <span>{task.comments.length}</span>
+                </div>
+              )}
+              <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground/70 bg-muted/50 px-2 py-0.5 rounded-full">
+                <Clock className="h-2.5 w-2.5" />
+                <span>
+                  {Math.floor(task.timeSpentMinutes / 60)}h {task.timeSpentMinutes % 60}m
+                </span>
               </div>
-            )}
-            <div className="flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              <span>
-                {Math.floor(task.timeSpentMinutes / 60)}h {task.timeSpentMinutes % 60}m
-              </span>
             </div>
           </div>
         </CardContent>

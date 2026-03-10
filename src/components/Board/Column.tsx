@@ -22,11 +22,11 @@ export function Column({ column, tasks, index }: ColumnProps) {
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
-          className={`flex flex-col bg-gray-200/50 dark:bg-gray-800/50 w-[320px] shrink-0 rounded-xl h-[calc(100vh-8rem)] ${snapshot.isDragging ? 'opacity-75 ring-2 ring-primary shadow-xl' : ''}`}
+          className={`flex flex-col kanban-column w-[320px] shrink-0 h-[calc(100vh-10rem)] transition-all duration-300 ${snapshot.isDragging ? 'rotate-1 scale-[1.02] shadow-2xl z-50' : ''}`}
         >
-          <div className="p-4 py-3 flex items-center justify-between border-b border-gray-200 dark:border-gray-800 rounded-t-xl">
-            <h3 className="font-semibold text-sm tracking-tight truncate">{column.title}</h3>
-            <span className="bg-gray-200 dark:bg-gray-800 text-xs py-0.5 px-2 rounded-full font-medium text-gray-600 dark:text-gray-400 shrink-0">
+          <div className="px-3 pb-4 flex items-center justify-between">
+            <h3 className="font-bold text-sm uppercase tracking-[0.1em] text-muted-foreground/80 truncate">{column.title}</h3>
+            <span className="bg-primary/10 text-primary text-[10px] py-0.5 px-2 rounded-full font-bold border border-primary/20 shrink-0">
               {tasks.length}
             </span>
           </div>
@@ -36,9 +36,8 @@ export function Column({ column, tasks, index }: ColumnProps) {
               <div
                 {...provided.droppableProps}
                 ref={provided.innerRef}
-                className={`flex-1 p-3 overflow-y-auto space-y-3 transition-colors ${
-                  snapshot.isDraggingOver ? 'bg-primary/5 dark:bg-primary/10' : ''
-                }`}
+                className={`flex-1 overflow-y-auto px-1 py-2 space-y-4 transition-colors rounded-xl ${snapshot.isDraggingOver ? 'bg-primary/5' : ''
+                  } scrollbar-hide`}
               >
                 {tasks.map((task, index) => (
                   <Draggable key={task.id} draggableId={task.id} index={index}>
@@ -56,11 +55,11 @@ export function Column({ column, tasks, index }: ColumnProps) {
                 {index === 0 && (
                   <Button
                     variant="ghost"
-                    className="w-full justify-start text-muted-foreground gap-2 h-9 mt-2"
+                    className="w-full justify-center text-muted-foreground/60 hover:text-primary hover:bg-primary/5 gap-2 h-10 border-2 border-dashed border-border/40 rounded-xl mt-4 transition-all duration-200"
                     onClick={() => setIsModalOpen(true)}
                   >
                     <Plus className="h-4 w-4" />
-                    Adicionar Tarefa
+                    <span className="text-xs font-bold uppercase tracking-wider">Nova Tarefa</span>
                   </Button>
                 )}
               </div>

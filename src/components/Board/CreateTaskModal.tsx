@@ -42,37 +42,39 @@ export function CreateTaskModal({ open, onOpenChange, columnId }: CreateTaskModa
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Nova Tarefa</DialogTitle>
+      <DialogContent className="sm:max-w-[450px] p-0 overflow-hidden glass-card border-white/10 shadow-2xl rounded-3xl animate-in fade-in zoom-in-95 duration-300">
+        <DialogHeader className="px-8 py-6 border-b bg-muted/5 backdrop-blur-md">
+          <DialogTitle className="text-xl font-bold tracking-tight">Nova Tarefa</DialogTitle>
+          <p className="text-xs font-medium text-muted-foreground/60 uppercase tracking-widest mt-1">Defina as bases do seu próximo passo</p>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 pt-4">
+        <form onSubmit={handleSubmit} className="p-8 space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="title">Título</Label>
+            <Label htmlFor="title" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/50 ml-1">Título da Tarefa</Label>
             <Input
               id="title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="O que precisa ser feito?"
               autoFocus
+              className="h-12 px-4 bg-muted/30 border-border/50 focus:bg-background/80 rounded-xl transition-all"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="description">Descrição</Label>
+            <Label htmlFor="description" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/50 ml-1">Descrição adicional</Label>
             <Textarea
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Adicione mais detalhes..."
-              className="resize-none"
+              placeholder="Adicione mais detalhes ou contextos..."
+              className="resize-none min-h-[100px] p-4 bg-muted/30 border-border/50 focus:bg-background/80 rounded-xl transition-all"
               rows={3}
             />
           </div>
-          <div className="flex justify-end gap-2 pt-2">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+          <div className="flex justify-end gap-3 pt-2">
+            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} className="rounded-xl px-6 font-bold uppercase text-[10px] tracking-widest">
               Cancelar
             </Button>
-            <Button type="submit" disabled={!title.trim()}>
+            <Button type="submit" disabled={!title.trim()} className="rounded-xl px-8 font-bold uppercase text-[10px] tracking-widest shadow-xl bg-primary hover:bg-primary/90 hover-lift">
               Adicionar
             </Button>
           </div>

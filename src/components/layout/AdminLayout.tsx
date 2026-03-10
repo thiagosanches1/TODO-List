@@ -3,42 +3,42 @@ import { Users, LayoutDashboard } from 'lucide-react';
 
 export function AdminLayout() {
   return (
-    <div className="flex h-full overflow-hidden">
+    <div className="flex h-full overflow-hidden bg-background">
       {/* Sidebar */}
-      <aside className="w-56 shrink-0 border-r bg-white dark:bg-gray-950 flex flex-col pt-6 gap-1 px-3">
-        <p className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+      <aside className="w-64 shrink-0 border-r bg-muted/30 backdrop-blur-sm flex flex-col pt-8 gap-1 px-4 transition-all duration-300">
+        <p className="px-3 text-[10px] font-bold text-muted-foreground uppercase tracking-[0.15em] mb-4 opacity-70">
           Administração
         </p>
-        <NavLink
-          to="/admin/users"
-          className={({ isActive }) =>
-            `flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-              isActive
-                ? 'bg-primary text-primary-foreground'
-                : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-            }`
-          }
-        >
-          <Users className="h-4 w-4 shrink-0" />
-          Usuários
-        </NavLink>
-        <NavLink
-          to="/admin/boards"
-          className={({ isActive }) =>
-            `flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-              isActive
-                ? 'bg-primary text-primary-foreground'
-                : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-            }`
-          }
-        >
-          <LayoutDashboard className="h-4 w-4 shrink-0" />
-          Boards
-        </NavLink>
+        <div className="space-y-1">
+          <NavLink
+            to="/admin/users"
+            className={({ isActive }) =>
+              `flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 ${isActive
+                ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20 translate-x-1'
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+              }`
+            }
+          >
+            <Users className="h-5 w-5 shrink-0" />
+            Usuários
+          </NavLink>
+          <NavLink
+            to="/admin/boards"
+            className={({ isActive }) =>
+              `flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 ${isActive
+                ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20 translate-x-1'
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+              }`
+            }
+          >
+            <LayoutDashboard className="h-5 w-5 shrink-0" />
+            Boards
+          </NavLink>
+        </div>
       </aside>
 
       {/* Main content */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto relative">
         <Outlet />
       </div>
     </div>

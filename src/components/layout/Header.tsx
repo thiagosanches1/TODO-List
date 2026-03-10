@@ -35,28 +35,30 @@ export function Header() {
   };
 
   return (
-    <header className="flex h-14 items-center justify-between border-b bg-white dark:bg-gray-950 px-6 shadow-sm shrink-0 gap-4">
-      <Link to="/" className="flex items-center gap-2 shrink-0">
-        <h1 className="text-xl font-bold flex items-center gap-2">
-          <span className="bg-primary text-primary-foreground p-1 rounded text-sm">✓</span>
+    <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md px-6 h-16 flex items-center justify-between shadow-sm shrink-0 gap-4">
+      <Link to="/" className="flex items-center gap-2 shrink-0 group">
+        <div className="bg-primary text-primary-foreground p-1.5 rounded-lg shadow-md group-hover:scale-110 transition-transform">
+          <span className="text-sm font-bold">✓</span>
+        </div>
+        <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
           TODO Kanban
         </h1>
       </Link>
 
-      {/* Board Selector — visible on dashboard for users with boards */}
+      {/* Board Selector */}
       {isDashboard && boards.length > 0 && (
-        <div className="flex items-center gap-2">
-          <label htmlFor="board-select" className="text-sm text-muted-foreground shrink-0 hidden sm:inline">
-            Board:
+        <div className="flex items-center gap-3 bg-muted/30 px-3 py-1.5 rounded-xl border border-border/50">
+          <label htmlFor="board-select" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground hidden sm:inline">
+            Board
           </label>
           <select
             id="board-select"
             value={currentBoardId || ''}
             onChange={(e) => setCurrentBoardId(e.target.value)}
-            className="h-8 rounded-md border border-input bg-background px-2 py-1 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 min-w-[140px] max-w-[240px]"
+            className="bg-transparent text-sm font-medium focus:outline-none min-w-[120px] cursor-pointer"
           >
             {boards.map((board) => (
-              <option key={board.id} value={board.id}>
+              <option key={board.id} value={board.id} className="bg-background">
                 {board.name}
               </option>
             ))}
@@ -67,39 +69,47 @@ export function Header() {
       <div className="flex items-center gap-4 ml-auto">
         {/* Greeting */}
         {displayName && (
-          <span className="text-sm text-muted-foreground whitespace-nowrap hidden sm:inline-block">
-            {getGreeting()}, <span className="font-medium text-foreground">{displayName}</span> !
-          </span>
+          <div className="hidden sm:flex flex-col items-end leading-tight">
+            <span className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground group">
+              {getGreeting()}
+            </span>
+            <span className="text-sm font-semibold">{displayName}</span>
+          </div>
         )}
 
-        {/* Back to board button — only in admin area */}
-        {isAdminArea && (
-          <Link to="/">
-            <Button variant="outline" size="sm" className="gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Voltar ao Board
-            </Button>
-          </Link>
-        )}
+        <div className="h-6 w-px bg-border mx-1" />
 
-        {/* Admin settings icon */}
-        {isAdmin && (
-          <Link to="/admin/users">
-            <Button
-              variant={isAdminArea ? 'secondary' : 'ghost'}
-              size="icon"
-              title="Área de Administração"
-            >
-              <Settings className={`h-5 w-5 ${isAdminArea ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`} />
-            </Button>
-          </Link>
-        )}
+        <div className="flex items-center gap-2">
+          {/* Back to board button — only in admin area */}
+          {isAdminArea && (
+            <Link to="/">
+              <Button variant="outline" size="sm" className="gap-2 rounded-full border-primary/20 hover:bg-primary/5">
+                <ArrowLeft className="h-4 w-4" />
+                <span className="hidden md:inline">Dashboard</span>
+              </Button>
+            </Link>
+          )}
 
-        <ThemeToggle />
-        <Button variant="ghost" size="sm" onClick={handleLogout} className="gap-2">
-          <LogOut className="h-4 w-4" />
-          <span className="hidden sm:inline">Sair</span>
-        </Button>
+          {/* Admin settings icon */}
+          {isAdmin && (
+            <Link to="/admin/users">
+              <Button
+                variant={isAdminArea ? 'secondary' : 'ghost'}
+                size="icon"
+                className="rounded-full"
+                title="Área de Administração"
+              >
+                <Settings className={`h-5 w-5 ${isAdminArea ? 'text-primary' : 'text-muted-foreground hover:text-primary transition-colors'}`} />
+              </Button>
+            </Link>
+          )}
+
+          <ThemeToggle />
+
+          <Button variant="ghost" size="icon" onClick={handleLogout} className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-full transition-colors">
+            <LogOut className="h-5 w-5" />
+          </Button>
+        </div>
       </div>
     </header>
   );

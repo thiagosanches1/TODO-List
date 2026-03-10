@@ -76,12 +76,12 @@ export function AdminBoardConfig() {
   const isDirty = useMemo(() => {
     if (deletedIds.length > 0) return true;
     if (localColumns.length !== initialColumns.length) return true;
-    
+
     // Check for any changes in existing columns
     return localColumns.some((col, idx) => {
       const original = initialColumns.find(ic => ic.id === col.id);
       if (!original) return true; // It's new
-      return original.title !== col.title || col.order_index !== idx;
+      return original.title !== col.title || original.order_index !== idx;
     });
   }, [localColumns, initialColumns, deletedIds]);
 
@@ -104,7 +104,7 @@ export function AdminBoardConfig() {
 
   const handleDeleteLocalColumn = (col: BoardColumn) => {
     if (!confirm(`Excluir a coluna "${col.title}"? Todas as tasks nela serão perdidas.`)) return;
-    
+
     setLocalColumns(localColumns.filter(c => c.id !== col.id));
     if (!col.isNew) {
       setDeletedIds([...deletedIds, col.id]);
@@ -156,7 +156,7 @@ export function AdminBoardConfig() {
         order_index: idx,
         board_id: boardId
       }));
-      
+
       const existingCols = localColumns.filter(c => !c.isNew).map((col, idx) => ({
         id: col.id,
         title: col.title,
@@ -267,15 +267,15 @@ export function AdminBoardConfig() {
                 <DragDropContext onDragEnd={onDragEnd}>
                   <Droppable droppableId="columns-admin">
                     {(provided) => (
-                      <tbody 
-                        {...provided.droppableProps} 
+                      <tbody
+                        {...provided.droppableProps}
                         ref={provided.innerRef}
                         className="divide-y divide-muted"
                       >
                         {localColumns.map((col, idx) => (
                           <Draggable key={col.id} draggableId={col.id} index={idx}>
                             {(provided, snapshot) => (
-                              <tr 
+                              <tr
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
                                 className={`hover:bg-muted/30 transition-colors ${snapshot.isDragging ? 'bg-muted shadow-lg' : ''}`}
@@ -299,16 +299,16 @@ export function AdminBoardConfig() {
                                         className="h-8 text-sm w-48"
                                         autoFocus
                                       />
-                                      <Button 
-                                        size="sm" 
+                                      <Button
+                                        size="sm"
                                         className="h-8 py-0 px-3 bg-green-600 hover:bg-green-700"
                                         onClick={() => handleRenameLocalColumn(col.id)}
                                       >
                                         Ok
                                       </Button>
-                                      <Button 
-                                        size="sm" 
-                                        variant="ghost" 
+                                      <Button
+                                        size="sm"
+                                        variant="ghost"
                                         className="h-8 py-0 px-3"
                                         onClick={() => setRenamingId(null)}
                                       >
@@ -365,8 +365,8 @@ export function AdminBoardConfig() {
       {/* Floating Save Bar for better visibility on mobile/long lists */}
       {isDirty && !loading && (
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex gap-4 p-4 bg-background border shadow-2xl rounded-full scale-110 md:scale-125 animate-in slide-in-from-bottom-10 fade-in duration-300">
-           <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             onClick={handleDiscard}
             className="rounded-full text-muted-foreground hover:text-destructive gap-2"
           >
@@ -374,8 +374,8 @@ export function AdminBoardConfig() {
             Cancelar
           </Button>
           <div className="w-[1px] bg-muted h-6 self-center" />
-          <Button 
-            onClick={handleSaveAll} 
+          <Button
+            onClick={handleSaveAll}
             disabled={isSubmitting}
             className="rounded-full bg-green-600 hover:bg-green-700 gap-2 font-bold px-6"
           >

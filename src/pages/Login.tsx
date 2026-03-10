@@ -35,13 +35,19 @@ export function Login() {
   return (
     <AuthBackground>
       <AuthCard
-        title="Entrar"
-        description="Acesse sua conta para gerenciar suas tarefas"
+        title="Bem-vindo"
+        description="Acesse sua conta para organizar seu fluxo de trabalho"
       >
-        <form onSubmit={handleLogin} className="space-y-4">
-          {error && <div className="text-red-500 text-sm p-3 bg-red-50 dark:bg-red-950/50 rounded-lg text-center font-medium border border-red-200 dark:border-red-900">{error}</div>}
+        <form onSubmit={handleLogin} className="space-y-5">
+          {error && (
+            <div className="text-destructive text-sm p-4 bg-destructive/10 rounded-xl text-center font-semibold border border-destructive/20 animate-in fade-in slide-in-from-top-2">
+              {error}
+            </div>
+          )}
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">
+              Email
+            </Label>
             <Input
               id="email"
               type="email"
@@ -49,22 +55,24 @@ export function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="bg-white/50 dark:bg-gray-900/50"
+              className="h-12 bg-background/50 border-border/50 rounded-xl focus:ring-primary/20 transition-all"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Senha</Label>
+            <Label htmlFor="password" className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">
+              Senha
+            </Label>
             <Input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="bg-white/50 dark:bg-gray-900/50"
+              className="h-12 bg-background/50 border-border/50 rounded-xl focus:ring-primary/20 transition-all"
             />
           </div>
-          <Button type="submit" className="w-full h-11 text-md shadow-lg transition-transform active:scale-[0.98]" disabled={loading}>
-            {loading ? "Entrando..." : "Entrar"}
+          <Button type="submit" className="w-full h-12 text-md font-bold rounded-xl shadow-lg shadow-primary/20 hover-lift mt-2" disabled={loading}>
+            {loading ? "Processando..." : "Acessar Painel"}
           </Button>
         </form>
       </AuthCard>

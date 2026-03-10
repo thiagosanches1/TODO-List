@@ -61,45 +61,59 @@ export function Dashboard() {
   // No boards assigned to this user
   if (!isLoading && boards.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-full gap-4 bg-gray-50 dark:bg-gray-900">
-        <LayoutDashboard className="h-16 w-16 text-muted-foreground/30" />
-        <h2 className="text-xl font-semibold text-muted-foreground">Nenhum board vinculado ao usuário</h2>
-        <p className="text-sm text-muted-foreground/70 text-center max-w-xs">
-          Entre em contato com um administrador para que te adicionem a um board.
-        </p>
+      <div className="flex flex-col items-center justify-center h-full gap-5 bg-background">
+        <div className="p-6 rounded-full bg-muted/50 border border-border/50 animate-in fade-in zoom-in duration-500">
+          <LayoutDashboard className="h-16 w-16 text-muted-foreground/40" />
+        </div>
+        <div className="text-center space-y-2 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
+          <h2 className="text-2xl font-bold tracking-tight">Nenhum board encontrado</h2>
+          <p className="text-muted-foreground max-w-xs mx-auto">
+            Parece que você ainda não foi convidado para nenhum board. Solicite acesso a um administrador.
+          </p>
+        </div>
       </div>
     );
   }
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-full bg-gray-50 dark:bg-gray-950">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <div className="flex flex-col items-center justify-center h-full bg-background gap-4">
+        <div className="relative h-16 w-16">
+          <div className="absolute inset-0 rounded-full border-4 border-primary/20" />
+          <div className="absolute inset-0 rounded-full border-4 border-primary border-t-transparent animate-spin" />
+        </div>
+        <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground animate-pulse">
+          Carregando...
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="h-full flex flex-col bg-gray-100 dark:bg-gray-900 overflow-hidden">
-      {/* Board name bar */}
+    <div className="h-full flex flex-col bg-background overflow-hidden">
+      {/* Board header bar */}
       {currentBoard && (
-        <div className="px-6 pt-4 pb-0 shrink-0">
-          <div className="flex items-center gap-2">
-            <LayoutDashboard className="h-4 w-4 text-primary" />
-            <h2 className="text-base font-semibold text-foreground">{currentBoard.name}</h2>
-            {currentBoard.description && (
-              <span className="text-sm text-muted-foreground">— {currentBoard.description}</span>
-            )}
+        <div className="px-8 py-5 shrink-0 border-b bg-muted/5 backdrop-blur-sm">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/10 text-primary">
+              <LayoutDashboard className="h-5 w-5" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold tracking-tight leading-none mb-1">{currentBoard.name}</h2>
+              {currentBoard.description && (
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{currentBoard.description}</p>
+              )}
+            </div>
           </div>
         </div>
       )}
 
-      <main className="flex-1 overflow-x-auto p-6">
+      <main className="flex-1 overflow-x-auto px-8 py-8 scrollbar-hide">
         <DragDropContext onDragEnd={handleDragEnd}>
           <Droppable droppableId="board" direction="horizontal" type="column">
             {(provided) => (
               <div
-                className="flex gap-6 h-full items-start"
+                className="flex gap-8 h-full items-start"
                 {...provided.droppableProps}
                 ref={provided.innerRef}
               >
