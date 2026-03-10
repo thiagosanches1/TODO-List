@@ -25,7 +25,20 @@ export function Column({ column, tasks, index }: ColumnProps) {
           className={`flex flex-col kanban-column w-[320px] shrink-0 h-[calc(100vh-10rem)] transition-all duration-300 ${snapshot.isDragging ? 'rotate-1 scale-[1.02] shadow-2xl z-50' : ''}`}
         >
           <div className="px-3 pb-4 flex items-center justify-between">
-            <h3 className="font-bold text-sm uppercase tracking-[0.1em] text-muted-foreground/80 truncate">{column.title}</h3>
+            <div className="flex items-center gap-2">
+              <h3 className="font-bold text-sm uppercase tracking-[0.1em] text-muted-foreground/80 truncate">{column.title}</h3>
+              {index === 0 && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 rounded-md text-muted-foreground/60 hover:text-primary hover:bg-primary/10 transition-all duration-200"
+                  onClick={() => setIsModalOpen(true)}
+                  title="Nova Tarefa"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
             <span className="bg-primary/10 text-primary text-[10px] py-0.5 px-2 rounded-full font-bold border border-primary/20 shrink-0">
               {tasks.length}
             </span>
@@ -52,16 +65,7 @@ export function Column({ column, tasks, index }: ColumnProps) {
                 ))}
                 {provided.placeholder}
 
-                {index === 0 && (
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-center text-muted-foreground/60 hover:text-primary hover:bg-primary/5 gap-2 h-10 border-2 border-dashed border-border/40 rounded-xl mt-4 transition-all duration-200"
-                    onClick={() => setIsModalOpen(true)}
-                  >
-                    <Plus className="h-4 w-4" />
-                    <span className="text-xs font-bold uppercase tracking-wider">Nova Tarefa</span>
-                  </Button>
-                )}
+
               </div>
             )}
           </Droppable>
