@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import type { DropResult } from '@hello-pangea/dnd';
 import { useKanbanStore } from '@/store/kanbanStore';
@@ -11,14 +11,49 @@ export function Dashboard() {
     columns, tasks, moveTask, fetchData, isLoading,
     boards, currentBoardId,
   } = useKanbanStore();
+  const boardRef = useRef<HTMLDivElement | null>(null);
+  const mirrorRef = useRef<HTMLDivElement | null>(null);
+  const mirrorInnerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     fetchData();
   }, [fetchData, currentBoardId]);
-
   const sortedColumns = useMemo(() => {
     return [...columns].sort((a, b) => a.order - b.order);
   }, [columns]);
+
+  useEffect(() => {
+    const board = boardRef.current;
+    const mirror = mirrorRef.current;
+    const mirrorInner = mirrorInnerRef.current;
+    if (!board || !mirror || !mirrorInner) return;
+
+    const updateWidth = () => {
+      mirrorInner.style.width = board.scrollWidth + 'px';
+      mirror.scrollLeft = board.scrollLeft;
+    };
+
+    updateWidth();
+
+    const onBoardScroll = () => {
+      if (mirror) mirror.scrollLeft = board.scrollLeft;
+    };
+    const onMirrorScroll = () => {
+      if (board) board.scrollLeft = mirror.scrollLeft;
+    };
+
+    board.addEventListener('scroll', onBoardScroll, { passive: true });
+    mirror.addEventListener('scroll', onMirrorScroll, { passive: true });
+
+    const ro = new ResizeObserver(updateWidth);
+    ro.observe(board);
+
+    return () => {
+      board.removeEventListener('scroll', onBoardScroll);
+      mirror.removeEventListener('scroll', onMirrorScroll);
+      ro.disconnect();
+    };
+  }, [columns, tasks]);
 
   const currentBoard = useMemo(
     () => boards.find(b => b.id === currentBoardId),
@@ -109,14 +144,15 @@ export function Dashboard() {
       )}
 
       <main className="flex-1 overflow-auto px-8 py-8">
-        <DragDropContext onDragEnd={handleDragEnd}>
-          <Droppable droppableId="board" direction="horizontal" type="column">
-            {(provided) => (
-              <div
-                className="flex gap-8 h-full items-start"
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-              >
+        <div ref={boardRef} className="h-full w-full overflow-x-auto overflow-y-hidden hide-scrollbar">
+          <DragDropContext onDragEnd={handleDragEnd}>
+            <Droppable droppableId="board" direction="horizontal" type="column">
+              {(provided) => (
+                <div
+                  className="flex gap-8 h-full items-start"
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                >
                 {sortedColumns.map((col, index) => {
                   const columnTasks = tasks
                     .filter(t => t.status === col.id)
@@ -134,7 +170,17 @@ export function Dashboard() {
               </div>
             )}
           </Droppable>
-        </DragDropContext>
+          </DragDropContext>
+        </div>
+
+        {/* Mirror scrollbar fixed at bottom to allow horizontal scrolling without vertical scroll */}
+        <div
+          ref={mirrorRef}
+          className="fixed left-0 right-0 bottom-0 h-6 overflow-x-auto overflow-y-hidden z-50"
+          aria-hidden
+        >
+          <div ref={mirrorInnerRef} className="h-px" />
+        </div>
       </main>
     </div>
   );
