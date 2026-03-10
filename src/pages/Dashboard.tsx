@@ -149,7 +149,7 @@ export function Dashboard() {
             <Droppable droppableId="board" direction="horizontal" type="column">
               {(provided) => (
                 <div
-                  className="flex gap-8 h-full items-start"
+                  className="flex gap-8 h-full items-stretch"
                   {...provided.droppableProps}
                   ref={provided.innerRef}
                 >
@@ -163,6 +163,7 @@ export function Dashboard() {
                       column={col}
                       tasks={columnTasks}
                       index={index}
+                      isLast={index === sortedColumns.length - 1}
                     />
                   );
                 })}

@@ -10,9 +10,10 @@ interface ColumnProps {
   column: ColumnType;
   tasks: TaskType[];
   index: number;
+  isLast?: boolean;
 }
 
-export function Column({ column, tasks, index }: ColumnProps) {
+export function Column({ column, tasks, index, isLast = false }: ColumnProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
@@ -22,7 +23,7 @@ export function Column({ column, tasks, index }: ColumnProps) {
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
-          className={`flex flex-col kanban-column w-[320px] shrink-0 transition-all duration-300 ${snapshot.isDragging ? 'rotate-1 scale-[1.02] shadow-2xl z-50' : ''}`}
+          className={`relative flex flex-col kanban-column w-[320px] min-h-full shrink-0 transition-all duration-300 ${!isLast ? 'pr-6' : ''} ${snapshot.isDragging ? 'rotate-1 scale-[1.02] shadow-2xl z-50' : ''}`}
         >
           <div className="px-3 pb-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -76,6 +77,9 @@ export function Column({ column, tasks, index }: ColumnProps) {
             onOpenChange={setIsModalOpen}
             columnId={column.id}
           />
+          {!isLast && (
+            <div className="absolute right-0 top-0 bottom-0 w-[2px] bg-border/20 pointer-events-none" />
+          )}
         </div >
       )
       }
