@@ -227,12 +227,18 @@ export function TaskDetailsModal({ task, open, onOpenChange }: TaskDetailsModalP
                         <X className="w-3.5 h-3.5" />
                       </button>
                       <div className="flex justify-between items-start mb-2 pr-8">
-                        <span className="font-bold text-[11px] text-primary tracking-tight">{comment.authorEmail.split('@')[0]}</span>
-                        <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/50">
-                          {new Date(comment.createdAt).toLocaleDateString()} — {new Date(comment.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                      </div>
-                      <p className="text-foreground/80 leading-relaxed text-xs">{comment.text}</p>
+                            {(() => {
+                              const raw = comment.authorEmail ? comment.authorEmail.split('@')[0] : 'usuário';
+                              const display = raw.charAt(0).toUpperCase() + raw.slice(1);
+                              return (
+                                <span className="font-bold text-sm text-primary tracking-tight">{display}</span>
+                              );
+                            })()}
+                            <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/50">
+                              {new Date(comment.createdAt).toLocaleDateString()} — {new Date(comment.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </div>
+                          <p className="text-foreground/80 leading-relaxed text-sm">{comment.text}</p>
                     </div>
                   ))
                 )}
