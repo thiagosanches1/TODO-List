@@ -40,16 +40,21 @@ export function Dashboard() {
     moveTask(draggableId, destination.droppableId, destination.index);
 
     const destColumn = columns.find(c => c.id === destination.droppableId);
+
+    // Trigger confetti if it's the last column (highest order) OR has "conclu" in the title
     const isLastColumn = sortedColumns.length > 0 &&
       sortedColumns[sortedColumns.length - 1].id === destination.droppableId;
+    const hasConcluTitle = destColumn?.title.toLowerCase().includes('conclu');
 
-    if (destColumn && isLastColumn) {
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ['#22c55e', '#3b82f6', '#eab308'],
-      });
+    if (destColumn && (isLastColumn || hasConcluTitle)) {
+      setTimeout(() => {
+        confetti({
+          particleCount: 150,
+          spread: 80,
+          origin: { y: 0.6 },
+          colors: ['#22c55e', '#3b82f6', '#eab308', '#ec4899'],
+        });
+      }, 100);
     }
   };
 
