@@ -18,6 +18,8 @@ interface TaskDetailsModalProps {
 
 export function TaskDetailsModal({ task, open, onOpenChange }: TaskDetailsModalProps) {
   const { updateTask, userEmail, boardMembers } = useKanbanStore();
+  const creator = boardMembers.find(m => m.email === task.creatorEmail);
+  const creatorDisplay = creator?.fullName || task.creatorEmail || 'Usuário';
 
   // Local state for editing fields
   const [title, setTitle] = useState(task.title);
@@ -125,7 +127,7 @@ export function TaskDetailsModal({ task, open, onOpenChange }: TaskDetailsModalP
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Criado por</span>
-                  <span className="text-[10px] font-bold text-primary/80 bg-primary/5 px-2 py-0.5 rounded-full border border-primary/10">{task.creatorEmail}</span>
+                  <span className="text-[10px] font-bold text-primary/80 bg-primary/5 px-2 py-0.5 rounded-full border border-primary/10">{creatorDisplay}</span>
                 </div>
               </div>
             </div>

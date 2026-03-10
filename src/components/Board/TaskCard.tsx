@@ -14,7 +14,9 @@ interface TaskCardProps {
 
 export function TaskCard({ task, provided, isDragging }: TaskCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { deleteTask } = useKanbanStore();
+  const { deleteTask, boardMembers } = useKanbanStore();
+  const creator = boardMembers.find(m => m.email === task.creatorEmail);
+  const creatorDisplay = creator?.fullName || (task.creatorEmail ? task.creatorEmail.split('@')[0] : '');
 
   return (
     <>
@@ -55,7 +57,7 @@ export function TaskCard({ task, provided, isDragging }: TaskCardProps) {
                 <div className="p-1 rounded-full bg-muted border border-border/50">
                   <User className="h-2.5 w-2.5 text-muted-foreground" />
                 </div>
-                <span className="text-[10px] font-medium text-muted-foreground truncate">{task.creatorEmail.split('@')[0]}</span>
+                <span className="text-[10px] font-medium text-muted-foreground truncate">{creatorDisplay}</span>
               </div>
             )}
             <div className="flex-1" />
