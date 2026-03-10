@@ -108,7 +108,7 @@ export function Dashboard() {
         </div>
       )}
 
-      <main className="flex-1 overflow-auto px-8 py-8 scrollbar-hide">
+      <main className="flex-1 overflow-auto px-8 py-8">
         <DragDropContext onDragEnd={handleDragEnd}>
           <Droppable droppableId="board" direction="horizontal" type="column">
             {(provided) => (
