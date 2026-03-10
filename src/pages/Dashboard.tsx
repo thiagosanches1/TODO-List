@@ -28,9 +28,14 @@ export function Dashboard() {
     const mirrorInner = mirrorInnerRef.current;
     if (!board || !mirror || !mirrorInner) return;
 
-    const updateWidth = () => {
-      mirrorInner.style.width = board.scrollWidth + 'px';
-      mirror.scrollLeft = board.scrollLeft;
+      const updateWidth = () => {
+        const boardScrollWidth = board.scrollWidth;
+        const boardClientWidth = board.clientWidth;
+        const mirrorClientWidth = mirror.clientWidth;
+        const desired = boardScrollWidth - boardClientWidth + mirrorClientWidth;
+        const width = Math.max(desired, mirrorClientWidth);
+        mirrorInner.style.width = width + 'px';
+        mirror.scrollLeft = board.scrollLeft;
     };
 
     updateWidth();
