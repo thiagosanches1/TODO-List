@@ -136,9 +136,21 @@ export function TaskDetailsModal({ task, open, onOpenChange }: TaskDetailsModalP
 
         <ScrollArea className="flex-1 p-6">
           <div className="space-y-6">
-            {/* Task Controls Row */}
+            {/* Task Controls Row (moved below description) */}
+
+            {/* Description */}
+            <div className="space-y-3">
+              <Label className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 ml-1 border-t border-border/30 pt-6 block">Descrição da Tarefa</Label>
+              <Textarea
+                placeholder="Adicione uma descrição mais detalhada..."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="min-h-[100px] resize-none bg-muted/30 border-border/50 focus:bg-background/80 rounded-2xl p-4 text-sm leading-relaxed transition-all"
+              />
+            </div>
+
+            {/* Assigned and Story Points (moved down to match creation modal) */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Assigned To */}
               <div className="space-y-3">
                 <Label className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 ml-1 flex items-center gap-1.5">
                   <User className="w-3 h-3" /> Atribuído a
@@ -150,7 +162,6 @@ export function TaskDetailsModal({ task, open, onOpenChange }: TaskDetailsModalP
                 />
               </div>
 
-              {/* Story Points */}
               <div className="space-y-3">
                 <Label className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 ml-1 flex items-center gap-1.5">
                   <Star className="w-3 h-3" /> Pontos da História
@@ -169,17 +180,6 @@ export function TaskDetailsModal({ task, open, onOpenChange }: TaskDetailsModalP
                   </div>
                 </div>
               </div>
-            </div>
-
-            {/* Description */}
-            <div className="space-y-3">
-              <Label className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 ml-1 border-t border-border/30 pt-6 block">Descrição da Tarefa</Label>
-              <Textarea
-                placeholder="Adicione uma descrição mais detalhada..."
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="min-h-[100px] resize-none bg-muted/30 border-border/50 focus:bg-background/80 rounded-2xl p-4 text-sm leading-relaxed transition-all"
-              />
             </div>
 
             {/* Time Tracking */}
