@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import ReactDOM from 'react-dom';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
@@ -48,6 +49,7 @@ export function AdminBoardConfig() {
   // Inline rename state
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameTitle, setRenameTitle] = useState('');
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchData();
@@ -254,76 +256,91 @@ export function AdminBoardConfig() {
               <p className="text-muted-foreground/70 text-xs mt-1">Crie a primeira coluna para este board.</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left">
-                <thead className="text-xs uppercase bg-muted/50 text-muted-foreground font-medium border-b">
-                  <tr>
-                    <th className="px-6 py-3 w-10"></th>
-                    <th className="px-6 py-3 w-10 text-center">#</th>
-                    <th className="px-6 py-3">Nome da Coluna</th>
-                    <th className="px-6 py-3 text-right">Ações</th>
-                  </tr>
-                </thead>
-                <DragDropContext onDragEnd={onDragEnd}>
-                  <Droppable droppableId="columns-admin">
-                    {(provided) => (
-                      <tbody
-                        {...provided.droppableProps}
-                        ref={provided.innerRef}
-                        className="divide-y divide-muted"
-                      >
-                        {localColumns.map((col, idx) => (
-                          <Draggable key={col.id} draggableId={col.id} index={idx}>
-                            {(provided, snapshot) => (
-                              <tr
+            <div className="w-full text-sm">
+              {/* Header */}
+              <div className="grid grid-cols-[48px_48px_1fr_180px] w-full text-xs uppercase bg-muted/50 text-muted-foreground font-extrabold border-b px-6 py-4">
+                <div className="flex justify-center text-primary/50">#</div>
+                <div className="text-center invisible">#</div>
+                <div>Nome da Coluna</div>
+                <div className="text-right px-4">Ações</div>
+              </div>
+
+              <DragDropContext onDragEnd={onDragEnd}>
+                <Droppable droppableId="columns-admin">
+                  {(provided, dropSnapshot) => (
+                    <div
+                      {...provided.droppableProps}
+                      ref={(el) => {
+                        provided.innerRef(el);
+                        (containerRef as any).current = el;
+                      }}
+                      className={`divide-y divide-muted w-full transition-colors relative ${dropSnapshot.isDraggingOver ? 'bg-muted/5' : ''}`}
+                    >
+                      {localColumns.map((col, idx) => (
+                        <Draggable key={col.id} draggableId={col.id} index={idx}>
+                          {(provided, snapshot) => {
+                            const draggingStyle = provided.draggableProps.style as any;
+                            const containerWidth = containerRef.current?.clientWidth;
+
+                            const content = (
+                              <div
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
-                                className={`hover:bg-muted/30 transition-colors ${snapshot.isDragging ? 'bg-muted shadow-lg' : ''}`}
+                                style={{
+                                  ...draggingStyle,
+                                  width: snapshot.isDragging && containerWidth ? `${containerWidth}px` : (draggingStyle?.width || '100%'),
+                                  position: snapshot.isDragging ? 'fixed' : draggingStyle?.position,
+                                  zIndex: snapshot.isDragging ? 1000 : draggingStyle?.zIndex,
+                                }}
+                                className={`${snapshot.isDragging ? 'pointer-events-none' : ''}`}
                               >
-                                <td className="px-4 py-4 w-10">
-                                  <div {...provided.dragHandleProps} className="cursor-grab active:cursor-grabbing p-1 hover:bg-muted rounded text-muted-foreground">
-                                    <GripVertical className="h-4 w-4" />
-                                  </div>
-                                </td>
-                                <td className="px-6 py-4 w-10 text-center text-muted-foreground font-mono text-xs">{idx + 1}</td>
-                                <td className="px-6 py-4 font-semibold">
-                                  {renamingId === col.id ? (
-                                    <div className="flex items-center gap-2">
-                                      <Input
-                                        value={renameTitle}
-                                        onChange={(e) => setRenameTitle(e.target.value)}
-                                        onKeyDown={(e) => {
-                                          if (e.key === 'Enter') handleRenameLocalColumn(col.id);
-                                          if (e.key === 'Escape') setRenamingId(null);
-                                        }}
-                                        className="h-8 text-sm w-48"
-                                        autoFocus
-                                      />
-                                      <Button
-                                        size="sm"
-                                        className="h-8 py-0 px-3 bg-green-600 hover:bg-green-700"
-                                        onClick={() => handleRenameLocalColumn(col.id)}
-                                      >
-                                        Ok
-                                      </Button>
-                                      <Button
-                                        size="sm"
-                                        variant="ghost"
-                                        className="h-8 py-0 px-3"
-                                        onClick={() => setRenamingId(null)}
-                                      >
-                                        Cancelar
-                                      </Button>
+                                <div className={`grid grid-cols-[48px_48px_1fr_180px] w-full items-center transition-all px-6 py-4 ${snapshot.isDragging
+                                  ? 'bg-background border-2 border-primary shadow-2xl rounded-2xl ring-4 ring-primary/20 scale-[1.01]'
+                                  : 'hover:bg-muted/30'
+                                  }`}>
+                                  <div className="flex justify-center">
+                                    <div {...provided.dragHandleProps} className="cursor-grab active:cursor-grabbing p-1.5 hover:bg-muted rounded-lg text-muted-foreground transition-all hover:text-primary pointer-events-auto">
+                                      <GripVertical className="h-4.5 w-4.5" />
                                     </div>
-                                  ) : (
-                                    <span className="flex items-center gap-2">
-                                      {col.title}
-                                      {col.isNew && <span className="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Nova</span>}
-                                    </span>
-                                  )}
-                                </td>
-                                <td className="px-6 py-4 text-right">
-                                  <div className="flex justify-end gap-2">
+                                  </div>
+                                  <div className="text-center text-muted-foreground font-mono text-xs font-black">{idx + 1}</div>
+                                  <div className="font-bold px-2 truncate min-w-0">
+                                    {renamingId === col.id ? (
+                                      <div className="flex items-center gap-2 pointer-events-auto">
+                                        <Input
+                                          value={renameTitle}
+                                          onChange={(e) => setRenameTitle(e.target.value)}
+                                          onKeyDown={(e) => {
+                                            if (e.key === 'Enter') handleRenameLocalColumn(col.id);
+                                            if (e.key === 'Escape') setRenamingId(null);
+                                          }}
+                                          className="h-9 text-sm w-full max-w-[240px] bg-background/50 border-primary/30 font-bold"
+                                          autoFocus
+                                        />
+                                        <Button
+                                          size="sm"
+                                          className="h-9 py-0 px-4 bg-green-600 hover:bg-green-700 shadow-md font-bold"
+                                          onClick={() => handleRenameLocalColumn(col.id)}
+                                        >
+                                          Salvar
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          variant="ghost"
+                                          className="h-9 py-0 px-4 font-bold"
+                                          onClick={() => setRenamingId(null)}
+                                        >
+                                          Sair
+                                        </Button>
+                                      </div>
+                                    ) : (
+                                      <span className="flex items-center gap-2 group/title">
+                                        <span className="group-hover/title:text-primary transition-colors truncate">{col.title}</span>
+                                        {col.isNew && <span className="text-[9px] bg-primary text-primary-foreground px-2 py-0.5 rounded-full font-black uppercase tracking-widest flex-shrink-0 animate-pulse">Nova</span>}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="flex justify-end gap-2 px-2 pointer-events-auto">
                                     <Button
                                       variant="ghost"
                                       size="icon"
@@ -331,32 +348,37 @@ export function AdminBoardConfig() {
                                         setRenamingId(col.id);
                                         setRenameTitle(col.title);
                                       }}
-                                      className="h-8 w-8 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                                      className="h-9 w-9 text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-xl transition-all"
                                       title="Renomear"
                                     >
-                                      <Edit2 className="h-4 w-4" />
+                                      <Edit2 className="h-4.5 w-4.5" />
                                     </Button>
                                     <Button
                                       variant="ghost"
                                       size="icon"
                                       onClick={() => handleDeleteLocalColumn(col)}
-                                      className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                      className="h-9 w-9 text-destructive hover:text-white hover:bg-destructive shadow-sm hover:shadow-destructive/40 rounded-xl transition-all"
                                       title="Excluir"
                                     >
-                                      <Trash2 className="h-4 w-4" />
+                                      <Trash2 className="h-4.5 w-4.5" />
                                     </Button>
                                   </div>
-                                </td>
-                              </tr>
-                            )}
-                          </Draggable>
-                        ))}
-                        {provided.placeholder}
-                      </tbody>
-                    )}
-                  </Droppable>
-                </DragDropContext>
-              </table>
+                                </div>
+                              </div>
+                            );
+
+                            if (snapshot.isDragging) {
+                              return ReactDOM.createPortal(content, document.body);
+                            }
+                            return content;
+                          }}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </DragDropContext>
             </div>
           )}
         </CardContent>
