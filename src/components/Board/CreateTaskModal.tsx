@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useKanbanStore } from '@/store/kanbanStore';
+import { MemberSelector } from './MemberSelector';
+import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -13,9 +14,11 @@ interface CreateTaskModalProps {
 }
 
 export function CreateTaskModal({ open, onOpenChange, columnId }: CreateTaskModalProps) {
-  const { addTask, tasks, userEmail, currentBoardId } = useKanbanStore();
+  const { addTask, tasks, userEmail, currentBoardId, boardMembers } = useKanbanStore();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [assignedTo, setAssignedTo] = useState<string | undefined>(undefined);
+  const [storyPoints, setStoryPoints] = useState('0');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,6 +36,8 @@ export function CreateTaskModal({ open, onOpenChange, columnId }: CreateTaskModa
       timeSpentMinutes: 0,
       creatorEmail: userEmail || '',
       boardId: currentBoardId,
+      assignedTo: assignedTo,
+      storyPoints: parseInt(storyPoints || '0', 10),
       createdAt: new Date().toISOString(),
     });
 
@@ -70,6 +75,30 @@ export function CreateTaskModal({ open, onOpenChange, columnId }: CreateTaskModa
               className="resize-none min-h-[100px] p-4 bg-muted/30 border-border/50 focus:bg-background/80 rounded-xl transition-all"
               rows={3}
             />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/50 ml-1">Atribuído a</Label>
+              <div>
+                <MemberSelector
+                  members={boardMembers}
+                  selectedMemberId={assignedTo}
+                  onSelect={(id) => setAssignedTo(id)}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/50 ml-1">Pontos da História</Label>
+              <Input
+                type="number"
+                min="0"
+                value={storyPoints}
+                onChange={(e) => setStoryPoints(e.target.value)}
+                className="h-12 px-4 bg-muted/30 border-border/50 focus:bg-background/80 rounded-xl transition-all"
+              />
+            </div>
           </div>
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} className="rounded-xl px-6 font-bold uppercase text-[10px] tracking-widest">
