@@ -104,7 +104,7 @@ export function TaskDetailsModal({ task, open, onOpenChange }: TaskDetailsModalP
         onOpenChange(true);
       }
     }}>
-      <DialogContent className="sm:max-w-[650px] max-h-[95vh] h-auto flex flex-col p-0 overflow-hidden glass-card border-white/10 shadow-2xl rounded-3xl animate-in zoom-in-95 duration-300">
+      <DialogContent className="w-[98vw] max-w-[98vw] sm:w-[96vw] sm:max-w-[96vw] lg:w-[94vw] lg:max-w-[94vw] xl:w-[92vw] xl:max-w-[92vw] max-h-[92vh] h-[92vh] flex flex-col p-0 overflow-hidden glass-card border-white/10 shadow-2xl rounded-3xl animate-in zoom-in-95 duration-300">
         <DialogHeader className="px-8 py-5 border-b bg-muted/5 backdrop-blur-md shrink-0">
           <DialogTitle className="sr-only">Detalhes da Tarefa</DialogTitle>
           <div className="flex items-start gap-4">
@@ -134,83 +134,82 @@ export function TaskDetailsModal({ task, open, onOpenChange }: TaskDetailsModalP
           </div>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 p-6">
-          <div className="space-y-6">
-            {/* Task Controls Row (moved below description) */}
-
-            {/* Description */}
-            <div className="space-y-3">
-              <Label className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 ml-1 border-t border-border/30 pt-6 block">Descrição da Tarefa</Label>
-              <Textarea
-                placeholder="Adicione uma descrição mais detalhada..."
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="min-h-[100px] resize-none bg-muted/30 border-border/50 focus:bg-background/80 rounded-2xl p-4 text-sm leading-relaxed transition-all"
-              />
-            </div>
-
-            {/* Assigned and Story Points (moved down to match creation modal) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+          <ScrollArea className="shrink-0 max-h-[45vh] p-6">
+            <div className="space-y-6">
+              {/* Description */}
               <div className="space-y-3">
-                <Label className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 ml-1 flex items-center gap-1.5">
-                  <User className="w-3 h-3" /> Atribuído a
-                </Label>
-                <MemberSelector
-                  members={boardMembers}
-                  selectedMemberId={assignedTo}
-                  onSelect={(id) => setAssignedTo(id || '')}
+                <Label className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 ml-1 border-t border-border/30 pt-6 block">Descrição da Tarefa</Label>
+                <Textarea
+                  placeholder="Adicione uma descrição mais detalhada..."
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="min-h-[100px] resize-none bg-muted/30 border-border/50 focus:bg-background/80 rounded-2xl p-4 text-sm leading-relaxed transition-all"
                 />
               </div>
 
-              <div className="space-y-3">
-                <Label className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 ml-1 flex items-center gap-1.5">
-                  <Star className="w-3 h-3" /> Pontos da História
-                </Label>
-                <div className="relative">
-                  <Input
-                    type="number"
-                    min="0"
-                    placeholder="0"
-                    value={storyPoints}
-                    onChange={(e) => setStoryPoints(e.target.value)}
-                    className="bg-muted/30 border-border/50 focus:bg-background/80 rounded-xl h-10 px-4 font-bold"
+              {/* Atribuído A, Pontos da História e Tempo Gasto na mesma linha */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-3">
+                  <Label className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 ml-1 flex items-center gap-1.5">
+                    <User className="w-3 h-3" /> Atribuído a
+                  </Label>
+                  <MemberSelector
+                    members={boardMembers}
+                    selectedMemberId={assignedTo}
+                    onSelect={(id) => setAssignedTo(id || '')}
                   />
-                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                    <span className="text-[10px] font-black text-muted-foreground/40 uppercase">PTS</span>
+                </div>
+
+                <div className="space-y-3">
+                  <Label className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 ml-1 flex items-center gap-1.5">
+                    <Star className="w-3 h-3" /> Pontos da História
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      type="number"
+                      min="0"
+                      placeholder="0"
+                      value={storyPoints}
+                      onChange={(e) => setStoryPoints(e.target.value)}
+                      className="bg-muted/30 border-border/50 focus:bg-background/80 rounded-xl h-10 px-4 font-bold"
+                    />
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                      <span className="text-[10px] font-black text-muted-foreground/40 uppercase">PTS</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <Label className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 ml-1 flex items-center gap-1.5">
+                    <Clock className="w-3 h-3" /> Tempo Gasto (Horas)
+                  </Label>
+                  <div className="flex items-center gap-3 p-3 rounded-2xl bg-muted/30 border border-border/30">
+                    <div className="relative">
+                      <Input
+                        type="number"
+                        min="0"
+                        placeholder="0"
+                        value={hours}
+                        onChange={(e) => setHours(e.target.value)}
+                        className="w-20 bg-background/50 border-border/50 focus:ring-primary/20 rounded-xl font-black text-center h-10 text-lg"
+                      />
+                      <div className="absolute -top-2 -right-1 bg-primary text-[8px] font-black uppercase px-1.5 py-0.5 rounded-md text-white shadow-sm">HRS</div>
+                    </div>
+                    <span className="text-[11px] font-bold text-muted-foreground/60 italic leading-tight">
+                      Inteiras. Total: {parseInt(hours || '0', 10) * 60} min
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
+          </ScrollArea>
 
-            {/* Time Tracking */}
-            <div className="space-y-3 pt-2">
-              <Label className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 ml-1 flex items-center gap-1.5">
-                <Clock className="w-3 h-3" /> Tempo Gasto (Horas)
-              </Label>
-              <div className="flex items-center gap-4 p-3 rounded-2xl bg-muted/30 border border-border/30">
-                <div className="relative">
-                  <Input
-                    type="number"
-                    min="0"
-                    placeholder="0"
-                    value={hours}
-                    onChange={(e) => setHours(e.target.value)}
-                    className="w-24 bg-background/50 border-border/50 focus:ring-primary/20 rounded-xl font-black text-center h-10 text-lg"
-                  />
-                  <div className="absolute -top-2 -right-1 bg-primary text-[8px] font-black uppercase px-1.5 py-0.5 rounded-md text-white shadow-sm">HRS</div>
-                </div>
-                <div className="flex-1 text-[11px] font-bold text-muted-foreground/60 italic leading-tight">
-                  Apenas horas inteiras.
-                  <br />
-                  Total: {task.timeSpentMinutes} min
-                </div>
-              </div>
-            </div>
-
-            {/* Comments List */}
-            <div className="space-y-4 pt-6 border-t border-border/30">
-              <Label className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 ml-1">Feed de Discussão</Label>
-              <div className="space-y-5">
+          {/* Feed de Discussão com scroll próprio — rodapé sempre visível */}
+          <div className="flex-1 min-h-[140px] flex flex-col border-t border-border/30 px-6 pt-4 pb-2 overflow-hidden">
+            <Label className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 ml-1 mb-3 shrink-0">Feed de Discussão</Label>
+            <ScrollArea className="flex-1 min-h-0 w-full rounded-2xl border border-border/30">
+              <div className="p-2 space-y-4 min-h-0">
                 {comments.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-8 text-center bg-muted/20 rounded-2xl border-2 border-dashed border-border/40">
                     <p className="text-xs text-muted-foreground/60 font-medium">Nenhum comentário por enquanto.</p>
@@ -227,25 +226,25 @@ export function TaskDetailsModal({ task, open, onOpenChange }: TaskDetailsModalP
                         <X className="w-3.5 h-3.5" />
                       </button>
                       <div className="flex justify-between items-start mb-2 pr-8">
-                            {(() => {
-                              const raw = comment.authorEmail ? comment.authorEmail.split('@')[0] : 'usuário';
-                              const display = raw.charAt(0).toUpperCase() + raw.slice(1);
-                              return (
-                                <span className="font-bold text-sm text-primary tracking-tight">{display}</span>
-                              );
-                            })()}
-                            <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/50">
-                              {new Date(comment.createdAt).toLocaleDateString()} — {new Date(comment.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </span>
-                          </div>
-                          <p className="text-foreground/80 leading-relaxed text-sm">{comment.text}</p>
+                        {(() => {
+                          const raw = comment.authorEmail ? comment.authorEmail.split('@')[0] : 'usuário';
+                          const display = raw.charAt(0).toUpperCase() + raw.slice(1);
+                          return (
+                            <span className="font-bold text-sm text-primary tracking-tight">{display}</span>
+                          );
+                        })()}
+                        <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/50">
+                          {new Date(comment.createdAt).toLocaleDateString()} — {new Date(comment.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                      <p className="text-foreground/80 leading-relaxed text-sm">{comment.text}</p>
                     </div>
                   ))
                 )}
               </div>
-            </div>
+            </ScrollArea>
           </div>
-        </ScrollArea>
+        </div>
 
         {/* Footer with Save/Cancel buttons */}
         <div className="p-5 border-t bg-muted/5 backdrop-blur-xl flex flex-col gap-4 shrink-0">
