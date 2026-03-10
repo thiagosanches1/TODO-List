@@ -7,7 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Clock, Send, X } from 'lucide-react';
+import { Clock, Send, X, Star, Calendar, User } from 'lucide-react';
+import { MemberSelector } from './MemberSelector';
 
 interface TaskDetailsModalProps {
   task: Task;
@@ -16,13 +17,14 @@ interface TaskDetailsModalProps {
 }
 
 export function TaskDetailsModal({ task, open, onOpenChange }: TaskDetailsModalProps) {
-  const { updateTask, userEmail } = useKanbanStore();
+  const { updateTask, userEmail, boardMembers } = useKanbanStore();
 
   // Local state for editing fields
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description || '');
+  const [assignedTo, setAssignedTo] = useState(task.assignedTo || '');
+  const [storyPoints, setStoryPoints] = useState(task.storyPoints?.toString() || '0');
   const [hours, setHours] = useState(Math.floor(task.timeSpentMinutes / 60).toString());
-  const [minutes, setMinutes] = useState((task.timeSpentMinutes % 60).toString());
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState<Comment[]>(task.comments || []);
 
@@ -31,8 +33,9 @@ export function TaskDetailsModal({ task, open, onOpenChange }: TaskDetailsModalP
     if (open) {
       setTitle(task.title);
       setDescription(task.description || '');
+      setAssignedTo(task.assignedTo || '');
+      setStoryPoints(task.storyPoints?.toString() || '0');
       setHours(Math.floor(task.timeSpentMinutes / 60).toString());
-      setMinutes((task.timeSpentMinutes % 60).toString());
       setComments(task.comments || []);
     }
   }, [task, open]);
@@ -40,11 +43,13 @@ export function TaskDetailsModal({ task, open, onOpenChange }: TaskDetailsModalP
   const handleSave = () => {
     if (!title.trim()) return;
 
-    const timeSpentMinutes = (parseInt(hours || '0', 10) * 60) + parseInt(minutes || '0', 10);
+    const timeSpentMinutes = parseInt(hours || '0', 10) * 60;
 
     updateTask(task.id, {
       title: title.trim(),
       description: description.trim(),
+      assignedTo: assignedTo || undefined,
+      storyPoints: parseInt(storyPoints || '0', 10),
       timeSpentMinutes,
       comments
     });
@@ -82,8 +87,9 @@ export function TaskDetailsModal({ task, open, onOpenChange }: TaskDetailsModalP
     // Reset local state to task values
     setTitle(task.title);
     setDescription(task.description || '');
+    setAssignedTo(task.assignedTo || '');
+    setStoryPoints(task.storyPoints?.toString() || '0');
     setHours(Math.floor(task.timeSpentMinutes / 60).toString());
-    setMinutes((task.timeSpentMinutes % 60).toString());
     onOpenChange(false);
   };
 
@@ -96,8 +102,8 @@ export function TaskDetailsModal({ task, open, onOpenChange }: TaskDetailsModalP
         onOpenChange(true);
       }
     }}>
-      <DialogContent className="sm:max-w-[650px] h-[90vh] flex flex-col p-0 overflow-hidden glass-card border-white/10 shadow-2xl rounded-3xl animate-in zoom-in-95 duration-300">
-        <DialogHeader className="px-8 py-6 border-b bg-muted/5 backdrop-blur-md shrink-0">
+      <DialogContent className="sm:max-w-[650px] max-h-[95vh] h-auto flex flex-col p-0 overflow-hidden glass-card border-white/10 shadow-2xl rounded-3xl animate-in zoom-in-95 duration-300">
+        <DialogHeader className="px-8 py-5 border-b bg-muted/5 backdrop-blur-md shrink-0">
           <DialogTitle className="sr-only">Detalhes da Tarefa</DialogTitle>
           <div className="flex items-start gap-4">
             <div className="p-2.5 rounded-xl bg-primary/10 text-primary mt-1">
@@ -109,61 +115,92 @@ export function TaskDetailsModal({ task, open, onOpenChange }: TaskDetailsModalP
                 onChange={(e) => setTitle(e.target.value)}
                 className="text-xl font-bold tracking-tight border-none bg-transparent hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-primary/20 px-3 h-auto py-1.5 -ml-3 rounded-xl transition-all"
               />
-              <div className="flex items-center gap-2 mt-2 px-1">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Criado por</span>
-                <span className="text-[10px] font-bold text-primary/80 bg-primary/5 px-2 py-0.5 rounded-full border border-primary/10">{task.creatorEmail}</span>
+              <div className="flex flex-wrap items-center gap-4 mt-2 px-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Criado em</span>
+                  <span className="text-[10px] font-bold text-muted-foreground/80 bg-muted/30 px-2 py-0.5 rounded-full border border-border/10 flex items-center gap-1.5">
+                    <Calendar className="w-2.5 h-2.5" />
+                    {new Date(task.createdAt).toLocaleDateString()} {new Date(task.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Criado por</span>
+                  <span className="text-[10px] font-bold text-primary/80 bg-primary/5 px-2 py-0.5 rounded-full border border-primary/10">{task.creatorEmail}</span>
+                </div>
               </div>
             </div>
           </div>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 p-8">
-          <div className="space-y-8">
+        <ScrollArea className="flex-1 p-6">
+          <div className="space-y-6">
+            {/* Task Controls Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Assigned To */}
+              <div className="space-y-3">
+                <Label className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 ml-1 flex items-center gap-1.5">
+                  <User className="w-3 h-3" /> Atribuído a
+                </Label>
+                <MemberSelector
+                  members={boardMembers}
+                  selectedMemberId={assignedTo}
+                  onSelect={(id) => setAssignedTo(id || '')}
+                />
+              </div>
+
+              {/* Story Points */}
+              <div className="space-y-3">
+                <Label className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 ml-1 flex items-center gap-1.5">
+                  <Star className="w-3 h-3" /> Pontos da História
+                </Label>
+                <div className="relative">
+                  <Input
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    value={storyPoints}
+                    onChange={(e) => setStoryPoints(e.target.value)}
+                    className="bg-muted/30 border-border/50 focus:bg-background/80 rounded-xl h-10 px-4 font-bold"
+                  />
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <span className="text-[10px] font-black text-muted-foreground/40 uppercase">PTS</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Description */}
             <div className="space-y-3">
-              <Label className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 ml-1">Descrição do Projeto</Label>
+              <Label className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 ml-1 border-t border-border/30 pt-6 block">Descrição da Tarefa</Label>
               <Textarea
                 placeholder="Adicione uma descrição mais detalhada..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="min-h-[120px] resize-none bg-muted/30 border-border/50 focus:bg-background/80 rounded-2xl p-4 text-sm leading-relaxed transition-all"
+                className="min-h-[100px] resize-none bg-muted/30 border-border/50 focus:bg-background/80 rounded-2xl p-4 text-sm leading-relaxed transition-all"
               />
             </div>
 
             {/* Time Tracking */}
             <div className="space-y-3 pt-2">
-              <Label className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 ml-1">Monitoramento de Tempo</Label>
-              <div className="flex items-center gap-6 p-4 rounded-2xl bg-muted/30 border border-border/30">
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <Input
-                      type="number"
-                      min="0"
-                      placeholder="0"
-                      value={hours}
-                      onChange={(e) => setHours(e.target.value)}
-                      className="w-20 bg-background/50 border-border/50 focus:ring-primary/20 rounded-xl font-bold text-center h-11"
-                    />
-                    <div className="absolute -top-2 -right-1 bg-primary text-[8px] font-black uppercase px-1.5 py-0.5 rounded-md text-white">HRS</div>
-                  </div>
+              <Label className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 ml-1 flex items-center gap-1.5">
+                <Clock className="w-3 h-3" /> Tempo Gasto (Horas)
+              </Label>
+              <div className="flex items-center gap-4 p-3 rounded-2xl bg-muted/30 border border-border/30">
+                <div className="relative">
+                  <Input
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    value={hours}
+                    onChange={(e) => setHours(e.target.value)}
+                    className="w-24 bg-background/50 border-border/50 focus:ring-primary/20 rounded-xl font-black text-center h-10 text-lg"
+                  />
+                  <div className="absolute -top-2 -right-1 bg-primary text-[8px] font-black uppercase px-1.5 py-0.5 rounded-md text-white shadow-sm">HRS</div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <Input
-                      type="number"
-                      min="0"
-                      max="59"
-                      placeholder="0"
-                      value={minutes}
-                      onChange={(e) => setMinutes(e.target.value)}
-                      className="w-20 bg-background/50 border-border/50 focus:ring-primary/20 rounded-xl font-bold text-center h-11"
-                    />
-                    <div className="absolute -top-2 -right-1 bg-indigo-500 text-[8px] font-black uppercase px-1.5 py-0.5 rounded-md text-white">MIN</div>
-                  </div>
-                </div>
-                <div className="flex-1" />
-                <div className="text-[11px] font-bold text-muted-foreground/80 italic">
-                  Total acumulado: {Math.floor(task.timeSpentMinutes / 60)}h {task.timeSpentMinutes % 60}m
+                <div className="flex-1 text-[11px] font-bold text-muted-foreground/60 italic leading-tight">
+                  Apenas horas inteiras.
+                  <br />
+                  Total: {task.timeSpentMinutes} min
                 </div>
               </div>
             </div>
@@ -203,7 +240,7 @@ export function TaskDetailsModal({ task, open, onOpenChange }: TaskDetailsModalP
         </ScrollArea>
 
         {/* Footer with Save/Cancel buttons */}
-        <div className="p-6 border-t bg-muted/5 backdrop-blur-xl flex flex-col gap-6 shrink-0">
+        <div className="p-5 border-t bg-muted/5 backdrop-blur-xl flex flex-col gap-4 shrink-0">
           <form className="flex gap-3" onSubmit={handleAddComment}>
             <Input
               placeholder="Digite uma mensagem ou atualização..."

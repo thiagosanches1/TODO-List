@@ -11,6 +11,15 @@ export interface Task {
   order: number;
   creatorEmail?: string;
   boardId: string;
+  assignedTo?: string;
+  storyPoints?: number;
+  createdAt: string;
+}
+
+export interface Profile {
+  id: string;
+  fullName: string | null;
+  email: string | null;
 }
 
 export interface Comment {
@@ -44,6 +53,7 @@ interface KanbanState {
   userEmail: string | null;
   userName: string | null;
   isAdmin: boolean;
+  boardMembers: Profile[];
 
   setUserEmail: (email: string | null) => void;
   setIsAdmin: (isAdmin: boolean) => void;
@@ -68,6 +78,7 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
   userEmail: null,
   userName: null,
   isAdmin: false,
+  boardMembers: [],
 
   setUserEmail: (email) => set({ userEmail: email }),
   setIsAdmin: (isAdmin) => set({ isAdmin }),
@@ -122,9 +133,10 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
 
     set({ isLoading: true, error: null });
 
-    const [colsRes, tasksRes] = await Promise.all([
+    const [colsRes, tasksRes, membersDataRes] = await Promise.all([
       supabase.from('columns').select('*').eq('board_id', currentBoardId).order('order_index', { ascending: true }),
       supabase.from('tasks').select('*').eq('board_id', currentBoardId).order('order_index', { ascending: true }),
+      supabase.from('board_members').select('user_id').eq('board_id', currentBoardId),
     ]);
 
     if (colsRes.error) {
@@ -136,6 +148,25 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
       console.error(tasksRes.error);
       set({ error: tasksRes.error.message, isLoading: false });
       return;
+    }
+
+    let mappedMembers: Profile[] = [];
+    if (membersDataRes.data && membersDataRes.data.length > 0) {
+      const memberIds = membersDataRes.data.map((m: any) => m.user_id);
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('*')
+        .in('id', memberIds);
+
+      if (profilesError) {
+        console.error('Error fetching member profiles:', profilesError);
+      } else {
+        mappedMembers = (profilesData || []).map((p: any) => ({
+          id: p.id,
+          fullName: p.full_name,
+          email: p.email,
+        }));
+      }
     }
 
     const mappedColumns: Column[] = colsRes.data.map((c: any) => ({
@@ -153,11 +184,13 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
       timeSpentMinutes: t.time_spent_minutes,
       comments: t.comments || [],
       order: t.order_index,
-      creatorEmail: t.creator_email,
       boardId: t.board_id,
+      assignedTo: t.assigned_to,
+      storyPoints: t.story_points,
+      createdAt: t.created_at,
     }));
 
-    set({ columns: mappedColumns, tasks: mappedTasks, isLoading: false });
+    set({ columns: mappedColumns, tasks: mappedTasks, boardMembers: mappedMembers, isLoading: false });
   },
 
   setColumns: (columns) => set({ columns }),
@@ -176,6 +209,8 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
       order_index: task.order,
       creator_email: task.creatorEmail,
       board_id: task.boardId,
+      assigned_to: task.assignedTo,
+      story_points: task.storyPoints,
     });
 
     if (error) console.error('Error adding task', error);
@@ -194,6 +229,8 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
     if ('comments' in updates) dbUpdates.comments = updates.comments;
     if ('order' in updates) dbUpdates.order_index = updates.order;
     if ('creatorEmail' in updates) dbUpdates.creator_email = updates.creatorEmail;
+    if ('assignedTo' in updates) dbUpdates.assigned_to = updates.assignedTo;
+    if ('storyPoints' in updates) dbUpdates.story_points = updates.storyPoints;
 
     if (Object.keys(dbUpdates).length > 0) {
       const { error } = await supabase.from('tasks').update(dbUpdates).eq('id', taskId);
