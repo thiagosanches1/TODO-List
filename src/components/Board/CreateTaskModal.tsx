@@ -33,6 +33,7 @@ export function CreateTaskModal({ open, onOpenChange, columnId }: CreateTaskModa
       timeSpentMinutes: 0,
       creatorEmail: userEmail || '',
       boardId: currentBoardId,
+      createdAt: new Date().toISOString(),
     });
 
     setTitle('');

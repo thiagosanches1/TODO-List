@@ -208,6 +208,7 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
       comments: task.comments,
       order_index: task.order,
       creator_email: task.creatorEmail,
+      created_at: task.createdAt,
       board_id: task.boardId,
       assigned_to: task.assignedTo,
       story_points: task.storyPoints,
