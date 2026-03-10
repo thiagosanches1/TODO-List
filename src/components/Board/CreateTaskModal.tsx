@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useKanbanStore } from '@/store/kanbanStore';
 import { MemberSelector } from './MemberSelector';
 import { Input } from '@/components/ui/input';
@@ -19,6 +19,14 @@ export function CreateTaskModal({ open, onOpenChange, columnId }: CreateTaskModa
   const [description, setDescription] = useState('');
   const [assignedTo, setAssignedTo] = useState<string | undefined>(undefined);
   const [storyPoints, setStoryPoints] = useState('0');
+
+  useEffect(() => {
+    if (open) {
+      // Reset assigned and story points every time the modal opens
+      setAssignedTo(undefined);
+      setStoryPoints('0');
+    }
+  }, [open]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
