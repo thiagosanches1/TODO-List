@@ -40,7 +40,10 @@ export function Dashboard() {
     moveTask(draggableId, destination.droppableId, destination.index);
 
     const destColumn = columns.find(c => c.id === destination.droppableId);
-    if (destColumn && destColumn.title.toLowerCase().includes('conclu')) {
+    const isLastColumn = sortedColumns.length > 0 &&
+      sortedColumns[sortedColumns.length - 1].id === destination.droppableId;
+
+    if (destColumn && isLastColumn) {
       confetti({
         particleCount: 100,
         spread: 70,
