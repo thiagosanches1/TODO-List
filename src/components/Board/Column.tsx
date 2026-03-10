@@ -22,7 +22,7 @@ export function Column({ column, tasks, index }: ColumnProps) {
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
-          className={`flex flex-col kanban-column w-[320px] shrink-0 h-[calc(100vh-10rem)] transition-all duration-300 ${snapshot.isDragging ? 'rotate-1 scale-[1.02] shadow-2xl z-50' : ''}`}
+          className={`flex flex-col kanban-column w-[320px] shrink-0 transition-all duration-300 ${snapshot.isDragging ? 'rotate-1 scale-[1.02] shadow-2xl z-50' : ''}`}
         >
           <div className="px-3 pb-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -49,9 +49,10 @@ export function Column({ column, tasks, index }: ColumnProps) {
               <div
                 {...provided.droppableProps}
                 ref={provided.innerRef}
-                className={`flex-1 overflow-y-auto px-1 py-2 space-y-4 transition-colors rounded-xl ${snapshot.isDraggingOver ? 'bg-primary/5' : ''
-                  } scrollbar-hide`}
+                className={`flex-1 px-1 py-2 space-y-4 transition-colors rounded-xl ${snapshot.isDraggingOver ? 'bg-primary/5' : ''
+                  }`}
               >
+
                 {tasks.map((task, index) => (
                   <Draggable key={task.id} draggableId={task.id} index={index}>
                     {(provided, snapshot) => (
@@ -75,8 +76,9 @@ export function Column({ column, tasks, index }: ColumnProps) {
             onOpenChange={setIsModalOpen}
             columnId={column.id}
           />
-        </div>
-      )}
-    </Draggable>
+        </div >
+      )
+      }
+    </Draggable >
   );
 }

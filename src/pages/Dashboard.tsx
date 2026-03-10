@@ -90,7 +90,7 @@ export function Dashboard() {
   }
 
   return (
-    <div className="h-full flex flex-col bg-background overflow-hidden">
+    <div className="min-h-full flex flex-col bg-background">
       {/* Board header bar */}
       {currentBoard && (
         <div className="px-8 py-5 shrink-0 border-b bg-muted/5 backdrop-blur-sm">
@@ -108,7 +108,7 @@ export function Dashboard() {
         </div>
       )}
 
-      <main className="flex-1 overflow-x-auto px-8 py-8 scrollbar-hide">
+      <main className="flex-1 overflow-auto px-8 py-8 scrollbar-hide">
         <DragDropContext onDragEnd={handleDragEnd}>
           <Droppable droppableId="board" direction="horizontal" type="column">
             {(provided) => (
