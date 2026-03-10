@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { AuthBackground } from "@/components/auth/AuthBackground";
@@ -37,11 +37,6 @@ export function Login() {
       <AuthCard
         title="Entrar"
         description="Acesse sua conta para gerenciar suas tarefas"
-        footer={
-          <div className="text-sm text-gray-500 text-center w-full mt-4">
-            Não tem uma conta? <Link to="/register" className="text-blue-600 dark:text-blue-400 font-semibold hover:underline">Cadastre-se</Link>
-          </div>
-        }
       >
         <form onSubmit={handleLogin} className="space-y-4">
           {error && <div className="text-red-500 text-sm p-3 bg-red-50 dark:bg-red-950/50 rounded-lg text-center font-medium border border-red-200 dark:border-red-900">{error}</div>}
