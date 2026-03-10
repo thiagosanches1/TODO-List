@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { LayoutDashboard, Plus, Trash2, Users, Loader2, Edit2, Columns } from 'lucide-react';
+import { LayoutDashboard, Plus, Trash2, Users, Loader2, Edit2, Columns, Search } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -51,6 +51,7 @@ export function AdminBoardManagement() {
   const [editingBoard, setEditingBoard] = useState<Board | null>(null);
   const [editName, setEditName] = useState('');
   const [editDescription, setEditDescription] = useState('');
+  const [memberSearchTerm, setMemberSearchTerm] = useState('');
 
   useEffect(() => {
     fetchData();
@@ -88,6 +89,16 @@ export function AdminBoardManagement() {
 
     setLoading(false);
   };
+
+  const filteredProfiles = useMemo(() => {
+    if (!memberSearchTerm.trim()) return profiles;
+    const term = memberSearchTerm.toLowerCase();
+    return profiles.filter(
+      p =>
+        p.full_name?.toLowerCase().includes(term) ||
+        p.email.toLowerCase().includes(term)
+    );
+  }, [profiles, memberSearchTerm]);
 
   const handleCreateBoard = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -130,6 +141,7 @@ export function AdminBoardManagement() {
 
   const openMembersModal = async (board: Board) => {
     setSelectedBoard(board);
+    setMemberSearchTerm('');
     setIsMembersOpen(true);
 
     // Load current members
@@ -372,11 +384,23 @@ export function AdminBoardManagement() {
               Membros — {selectedBoard?.name}
             </DialogTitle>
           </DialogHeader>
-          <div className="py-4 space-y-3 max-h-72 overflow-y-auto">
-            {profiles.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-4">Nenhum usuário cadastrado.</p>
+          <div className="relative mt-2">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Pesquisar por nome ou email..."
+              value={memberSearchTerm}
+              onChange={(e) => setMemberSearchTerm(e.target.value)}
+              className="pl-9 h-10"
+              autoFocus
+            />
+          </div>
+          <div className="py-2 space-y-2 max-h-72 overflow-y-auto mt-2">
+            {filteredProfiles.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-8">
+                {memberSearchTerm ? 'Nenhum usuário encontrado para sua busca.' : 'Nenhum usuário cadastrado.'}
+              </p>
             ) : (
-              profiles.map((profile) => (
+              filteredProfiles.map((profile) => (
                 <label
                   key={profile.id}
                   className="flex items-center gap-3 p-3 rounded-md hover:bg-accent cursor-pointer border border-transparent hover:border-border transition-colors"
