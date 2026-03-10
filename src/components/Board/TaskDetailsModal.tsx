@@ -241,9 +241,9 @@ export function TaskDetailsModal({ task, open, onOpenChange }: TaskDetailsModalP
                             <span className="font-bold text-sm text-primary tracking-tight">{display}</span>
                           );
                         })()}
-                        <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/50">
-                          {new Date(comment.createdAt).toLocaleDateString()} — {new Date(comment.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
+<span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">
+                              {new Date(comment.createdAt).toLocaleDateString()} — {new Date(comment.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
                       </div>
                       <p className="text-foreground/80 leading-relaxed text-sm">{comment.text}</p>
                     </div>
