@@ -28,6 +28,11 @@ const ProtectedRoute = ({
     return <Navigate to="/login" replace />;
   }
 
+  // If admin status is not yet known, wait instead of redirecting
+  if (requireAdmin && isAdmin === null) {
+    return <div className="flex h-screen items-center justify-center">Loading...</div>;
+  }
+
   if (requireAdmin && !isAdmin) {
     return <Navigate to="/" replace />;
   }
@@ -38,12 +43,13 @@ const ProtectedRoute = ({
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const { setUserEmail } = useKanbanStore();
+  const { setUserEmail, fetchBoards } = useKanbanStore();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUserEmail(session?.user?.email || null);
+      if (session) fetchBoards();
       setLoading(false);
     });
 
@@ -52,6 +58,7 @@ export default function App() {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUserEmail(session?.user?.email || null);
+      if (session) fetchBoards();
     });
 
     return () => subscription.unsubscribe();

@@ -52,11 +52,11 @@ interface KanbanState {
   error: string | null;
   userEmail: string | null;
   userName: string | null;
-  isAdmin: boolean;
+  isAdmin: boolean | null;
   boardMembers: Profile[];
 
   setUserEmail: (email: string | null) => void;
-  setIsAdmin: (isAdmin: boolean) => void;
+  setIsAdmin: (isAdmin: boolean | null) => void;
   setCurrentBoardId: (boardId: string | null) => void;
   fetchBoards: () => Promise<void>;
   fetchData: () => Promise<void>;
@@ -77,7 +77,7 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
   error: null,
   userEmail: null,
   userName: null,
-  isAdmin: false,
+  isAdmin: null,
   boardMembers: [],
 
   setUserEmail: (email) => set({ userEmail: email }),
